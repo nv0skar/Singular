@@ -1,0 +1,7 @@
+setuptools>=47.1.0
+numpy>=1.19.5
+PyNaCl>=1.4.0
+Mars>=0.4
+nanoid>=2.0.0
+rich>=9.11.0
+python-cfonts>=1.4.0

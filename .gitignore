@@ -1,0 +1,13 @@
+.idea/
+Singular/.idea/
+__pycache__/
+Singular/__pycache__/
+config.plist
+network.json
+Singular/config.plist
+Singular/network.json
+data/
+Singular/data/
+build/
+dist/
+Singular.egg-info/
