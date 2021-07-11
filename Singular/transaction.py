@@ -60,7 +60,7 @@ class Transaction:
             except AttributeError:
                 helper.report("Transaction verifier", "Failed verification")
                 pass
-            # Decode the address and the signature from Base64
+            # Decode the address and the signature from hexadecimal
             address = base64.b16decode(self.sender)
             signature = base64.b16decode(self.signature)
             # Get the verification key
@@ -77,9 +77,9 @@ class Transaction:
             return False
 
     def check(self, fetched=False):
-        '''
+        """
         Checks If the transaction could be added to the memPool or should be rejected
-        '''
+        """
         # Get memPool
         memPool = manager.Manager.memPool.getFromPool()
         # Check If the sender Is the receiver or the sender or the receiver Is empty

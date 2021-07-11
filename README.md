@@ -17,7 +17,7 @@ This project is the main implementation of the Singular protocol, however you co
 The Singular protocol documentation **is not written yet**, because the distributed network is not yet implemented, however you could suggest how the distributed network should be made in the **Discussions**.
 
 ## Singular's testnet ⭐️
-Singular has a default network which is called **mainSpace**, and it's main purpose is to test the Singular protocol and others implementations of it. As the title says is a testnet, which means that the quantity of coins that are issued are always the maximum amount setted.
+Singular has a default network which is called **mainSpace**, and it's main purpose is to test the Singular protocol and others implementations of it. As the title says is a testnet, which means that the quantity of coins that are issued are always the maximum amount set.
 
 ## Contribution 🌈
 You can contribute to make this a better project. If you want to purpose something you could join to the **Discussions**.
