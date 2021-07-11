@@ -22,7 +22,11 @@ Singular has a default network which is called **mainSpace**, and it's main purp
 ## Contribution 🌈
 You can contribute to make this a better project. If you want to purpose something you could join to the **Discussions**.
 
-## Development log 🧑‍💻
+## Development 🧑‍💻
+### Extra dependencies
+SuperPrinter (Required for displaying some info): `https://github.com/ItsTheGuy/SuperPrinter`
+Mars (Required to manage configs): `https://github.com/ItsTheGuy/Mars`
+
 ### TODO
 - [ ] Implement the distributed network
 - [ ] Write documentation for the protocol
