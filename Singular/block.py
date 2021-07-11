@@ -142,7 +142,7 @@ class utils:
             if type(blockData.difficulty) is None: blockData.difficulty = declarations.miningConfig.minDiff
         else:
             # Announce that the first block In the chain Is about to be mined If debug is activated
-            if declarations.debugConfig.debug: helper.report("Protocol", "First block in the chain is about to be mined!")
+            if declarations.debugConfig.debug: helper.report("main", "First block in the chain is about to be mined!")
             blockData.lastBlockHash = str("0" * 64)
             blockData.blockNumber = 0
             blockData.difficulty = declarations.miningConfig.minDiff

@@ -27,12 +27,13 @@ class Database:
         @staticmethod
         def debugChecker(db, debugValueKey, calledFrom):
             """
-            Check the debug status of the database
+            Check the debug status of the database passed
+            Also if the debug status of the database passed and the global debug status doesn't match, this will raise an integrity exception.
             """
             try:
                 debugStatus = bool(strtobool(bytes(db.get(str(debugValueKey).encode())).decode()))
                 if debugStatus is not None:
-                    if debugStatus is not bool(declarations.debugConfig.debug): exceptions.Exceptions.Compromised("Actual debug status and {} database debug status when initialized doesn't match".format(calledFrom), True)
+                    if debugStatus is not bool(declarations.debugConfig.debug): exceptions.Exceptions.Compromised("Global debug status and {} database debug status doesn't match, however, you could try changing the path of the chain and nodes databases or maybe deleting the contents of the databases by passing the --clear argument".format(calledFrom), True)
                 else: db.put(str(debugValueKey).encode(), str(bool(declarations.debugConfig.debug)).encode())
             except (AttributeError, TypeError):
                 db.put(str(debugValueKey).encode(), str(bool(declarations.debugConfig.debug)).encode())
@@ -61,7 +62,7 @@ class Database:
             """
             Add a new block
             """
-            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), "chains")
+            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), "chain")
             self.db.put(str(block.get("blockNumber")).encode(), str(block).encode())
             if int(block.get("blockNumber")) == int(self.chainLength): self.__lastBlock = block
             self.__lengthManager(1 if int(block.get("blockNumber")) == int(self.chainLength) else None)
@@ -72,7 +73,7 @@ class Database:
             Remove a block
             When a block is removed the chainLength doesn't decrement.
             """
-            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), "chains")
+            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), "chain")
             self.db.delete(str(int(blockNumber)).encode())
             self.__lengthManager()
             return True
@@ -81,7 +82,7 @@ class Database:
             """
             Get blocks
             """
-            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), "chains")
+            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), "chain")
             try:
                 if blockNumber == (self.chainLength-1) and self.__lastBlock is not None: return self.__lastBlock
                 else: return ast.literal_eval(bytes(self.db.get(str(int(blockNumber)).encode())).decode())

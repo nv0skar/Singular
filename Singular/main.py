@@ -34,6 +34,6 @@ def main():
         # Show frontend
         frontend.Frontend.initial(passedArguments)
         # Initialize
-        manager.Manager.protocol.loop(True, frontend.Frontend.show.blockMined)
+        manager.Manager.protocol.loop(True)
     except KeyboardInterrupt:
         pass

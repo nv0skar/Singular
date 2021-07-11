@@ -22,22 +22,23 @@ from . import p2p
 from . import storage
 from . import integrity
 from . import helper
+from . import frontend
 import multiprocessing
 
 class Manager:
     class chainMan:
         @staticmethod
-        def getHeight():
+        def getHeight() -> int:
             """
             Get the height of the chain
             This function Is on top of the getHeight function in Storage.
             """
-            return (storage.Storage.chainMan.getLength())
+            return int(storage.Storage.chainMan.getLength())
 
         @staticmethod
         def clearChain():
             """
-            Clear the chain
+            Delete the chain from the database
             This function Is on top of the clearChain function in Storage.
             """
             try:
@@ -89,14 +90,59 @@ class Manager:
                 helper.report("Chain manager", e)
                 return False
 
+    class nodesMan:
+        @staticmethod
+        def addNode(node):
+            """
+            Add node to the nodes list.
+            This function Is on top of the addNode function in Storage.savedNodes.
+            """
+            try:
+                storage.Storage.nodesMan.addNode(node)
+                return True
+            except: return False
+
+        @staticmethod
+        def removeNode(nodeNumber):
+            """
+            Remove node from the nodes list.
+            This function Is on top of the removeNode function in Storage.savedNodes.
+            """
+            try:
+                storage.Storage.nodesMan.removeNode(nodeNumber)
+                return True
+            except: return False
+
+        @staticmethod
+        def getNodes():
+            """
+            Get nodes to the nodes list.
+            This function Is on top of the getNodes function in Storage.savedNodes.
+            """
+            return storage.Storage.nodesMan.getNodes()
+
+        @staticmethod
+        def clearNodes():
+            """
+            Delete the nodes in the database
+            This function Is on top of the clearNodes function in Storage.
+            """
+            try:
+                storage.Storage.nodesMan.clearNodes()
+                return True
+            except: return False
+
     class protocol:
         @staticmethod
-        def loop(graphical=False, showDeclaration=None):
+        def loop(graphical=False):
             """
             Initialize routine.
             """
             # Check integrity
             integrity.Integrity.check()
+            # Get the height of the chain, and check if there are any blocks. If doesn't, ask to start a new chain
+            if int(Manager.chainMan.getHeight()) == 0:
+                if not bool(frontend.Frontend.dialogs.startChain()): exit()
             # Sync the chain, and not continue until there is no error
             # TODO - Implement networking
             while True is False: pass
@@ -106,7 +152,7 @@ class Manager:
             while True:
                 routine = Manager.protocol.go()
                 if routine is not False:
-                    if graphical: showDeclaration(routine)
+                    if graphical: frontend.Frontend.dialogs.blockMined(routine)
 
         @staticmethod
         def p2p():
@@ -181,37 +227,6 @@ class Manager:
             # Check If have to clean all the memPool
             if clean: declarations.databases.memPool.clearPool(); return True
             else: declarations.databases.memPool.removeFromPool(transaction)
-
-    class node:
-        @staticmethod
-        def addNode(node):
-            """
-            Add node to the nodes list.
-            This function Is on top of the addNode function in Storage.savedNodes.
-            """
-            try:
-                storage.Storage.savedNodes.addNode(node)
-                return True
-            except: return False
-
-        @staticmethod
-        def removeNode(nodeNumber):
-            """
-            Remove node from the nodes list.
-            This function Is on top of the removeNode function in Storage.savedNodes.
-            """
-            try:
-                storage.Storage.savedNodes.removeNode(nodeNumber)
-                return True
-            except: return False
-
-        @staticmethod
-        def getNodes():
-            """
-            Get nodes to the nodes list.
-            This function Is on top of the getNodes function in Storage.savedNodes.
-            """
-            return storage.Storage.savedNodes.getNodes()
 
     class wallet:
         @staticmethod

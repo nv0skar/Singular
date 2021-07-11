@@ -39,14 +39,9 @@ class Frontend:
         print("{} - {}\nCtrl-C to exit\n".format(declarations.info.get("version"), declarations.info.get("url")))
         if passedArguments is not None:
             # Show path If the show argument was passed
-            if passedArguments.get("show") and not passedArguments.get("quit"): print("Chain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
+            if passedArguments.show: print("Chain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
             # Show the network info, If the showNetwork argument was passed
-            if passedArguments.get("showNetwork") and not passedArguments.get("quit"): print("Network settings: {}\nEncoded version: {}".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
-        # Exit if minerAddress is unset
-        if declarations.staticConfig.minerAddress == "":
-            helper.report("main", "Miner address Is unset, please set one by running with the flaw '-m'\n", superPrinter.levels.critical)
-            exit()
-        # Then continue
+            if passedArguments.showNetwork: print("Network settings: {}\nEncoded version: {}".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
         pass
 
     class setup:
@@ -124,7 +119,14 @@ class Frontend:
             if not type(setupSuccess) is str: Console().print("Network setup agent completed successfully", style=Style(color="green"))
             else: Console().print("Network setup agent failed: {}".format(setupSuccess), style=Style(color="red", bold=True))
 
-    class show:
+    class dialogs:
+        @staticmethod
+        def startChain() -> bool:
+            """
+            Ask if a new chain should start
+            """
+            return bool(Confirm.ask("There isn't a chain started. Do you want to start a new one?"))
+
         @staticmethod
         def blockMined(block):
             """

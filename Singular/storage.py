@@ -39,7 +39,7 @@ class Storage:
         @staticmethod
         def clearChain():
             """
-            Remove node from the list
+            Delete the chain from the database
             """
             declarations.databases.chainDB.clear()
             return True
@@ -51,7 +51,7 @@ class Storage:
             """
             return (declarations.databases.chainDB.chainLength)
 
-    class savedNodes:
+    class nodesMan:
         @staticmethod
         def addNode(node):
             """
@@ -72,6 +72,14 @@ class Storage:
             Get nodes in the list
             """
             return (declarations.databases.nodesDB.get())
+
+        @staticmethod
+        def clearNodes():
+            """
+            Delete the nodes in the database
+            """
+            declarations.databases.nodesDB.clear()
+            return True
 
     class memPool:
         def __init__(self):

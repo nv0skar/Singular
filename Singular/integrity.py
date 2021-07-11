@@ -46,6 +46,7 @@ class Integrity:
             if not (networkMinDiffStatus or networkMaxDiffStatus and declarations.debugConfig.debug):
                     exceptions.Exceptions.Compromised("Inconsistent constant status", True)
         # Check the integrity of the settings
+        if declarations.staticConfig.minerAddress == "": exceptions.Exceptions.Compromised("Miner address Is unset, you can set one with the -m argument", True)
         if declarations.miningConfig.minDiff < 1 or declarations.miningConfig.minDiff > 32: exceptions.Exceptions.Compromised("Network's minDiff Is too low or too high", True)
         if declarations.miningConfig.maxDiff < 1 or declarations.miningConfig.maxDiff > 32: exceptions.Exceptions.Compromised("Network's maxDiff Is too low or too high", True)
         if declarations.chainConfig.maxAmount < declarations.chainConfig.blockMaxReward: exceptions.Exceptions.Compromised("Network's blockMaxReward Is higher than the maxAmount", True)

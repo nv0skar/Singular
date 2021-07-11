@@ -37,20 +37,22 @@ class Arguments:
         arguments.add_argument("-tmP", "--toggleMultiprocessingMining", help=("Enable multiprocessing mining" if declarations.miningConfig.multiprocessingMining is False else "Disable multiprocessing mining"), action="store_true")
         arguments.add_argument("--pathChain", help="Change the default path to save the chain (Add {path} to get the Singular path)", type=str, dest="chainPath")
         arguments.add_argument("--pathNodes", help="Change the default path to save the nodes (Add {path} to get the Singular path)", type=str, dest="nodesPath")
-        arguments.add_argument("--clear", help="Delete all the blocks In the chain", action="store_true")
+        arguments.add_argument("--clear", help="Delete the databases contents", action="store_true")
         arguments.add_argument("-nS", "--networkSetup", help="Prompt the Network Setup Agent", action="store_true")
         arguments.add_argument("-d", "--debug", help="Enables debug mode", action="store_true")
         arguments.add_argument("-q", "--quit", help="Exit", action="store_true")
         argsReturns = arguments.parse_args()
-        passedArguments = Arguments.update(argsReturns)
-        # Check If networkSetup, cleared or quit was passed
-        if passedArguments.get("networkSetupInitialized") or passedArguments.get("cleared") or passedArguments.get("quit"):
+        # Perform the tasks of the arguments
+        Arguments.update(argsReturns)
+        # Check if has to exit after the arguments passed
+        argsToExit = argsReturns.networkSetup or argsReturns.address or argsReturns.chainPath or argsReturns.nodesPath or argsReturns.frequencyBlockChecking or argsReturns.toggleMultiprocessingMining or argsReturns.clear or argsReturns.quit
+        if argsToExit:
             # If the show argument was passed, show the paths before exiting
-            if passedArguments.get("show") and passedArguments.get("quit"): print("\nChain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
+            if argsReturns.show: print("\nChain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
             # If the showNetwork argument was passed, show the network info before exiting
-            if passedArguments.get("showNetwork") and passedArguments.get("quit"): print("Network settings: {}\nEncoded version: {}".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
+            if argsReturns.showNetwork: print("Network settings: {}\nEncoded version: {}".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
             exit()
-        return passedArguments
+        return argsReturns
 
     @staticmethod
     def update(argsReturns):
@@ -95,6 +97,8 @@ class Arguments:
         # Check If clear was passed
         if argsReturns.clear:
             # Remove chain
-            if manager.Manager.chainMan.clearChain(): print("Chain deleted successfully!")
-            else: print("There was some error while trying to delete chain")
-        return dict(show=argsReturns.show, showNetwork=argsReturns.showNetwork, networkSetupInitialized=argsReturns.networkSetup, cleared=argsReturns.clear, quit=argsReturns.quit)
+            if manager.Manager.chainMan.clearChain(): print("Chain deleted from the database successfully!")
+            else: print("There was some error while trying to delete chain from the database")
+            if manager.Manager.nodesMan.clearNodes(): print("Nodes deleted from the database successfully!")
+            else: print("There was some error while trying to delete the nodes from the database")
+        return
