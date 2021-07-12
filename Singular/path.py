@@ -20,7 +20,6 @@ class Path:
     @staticmethod
     def preparePath(path):
         """
-        Prepare path to be valid (Avoid FileNotFoundError exceptions)
+        Prepare path
         """
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        return path

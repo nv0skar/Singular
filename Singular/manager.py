@@ -145,9 +145,6 @@ class Manager:
                 if not bool(frontend.Frontend.dialogs.startChain()): exit()
             # Sync the chain, and not continue until there is no error
             # TODO - Implement networking
-            while True is False: pass
-            # Initialize p2p
-            Manager.protocol.p2p()
             # Initialize
             while True:
                 routine = Manager.protocol.go()

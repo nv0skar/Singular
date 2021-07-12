@@ -55,10 +55,18 @@ class Miner:
             return dict(blockMined)
 
     @staticmethod
+    def checkMultiprocessing(event):
+        """
+        Check if multiprocessing is enabled
+        """
+        if event is None and not declarations.miningConfig.multiprocessingMining: return True
+        if event is not None and declarations.miningConfig.multiprocessingMining: return (not event.is_set())
+
+    @staticmethod
     def mine(blockToMine, difficulty, prefix, initializingTime, passBlock=None, event=None):
         # Declare counterToCheck
         counterToCheck = 0
-        while (not event.is_set()) if declarations.dynamicConfig.multiprocessingMining else True:
+        while Miner.checkMultiprocessing(event):
             # Increment counterToCheck
             counterToCheck += 1
             # Check If the block Is already In the chain
