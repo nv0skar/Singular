@@ -15,9 +15,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import multiprocessing
 from . import globals
 from . import database
 from . import storage
+from . import miner
 import mars
 import superPrinter
 
@@ -40,7 +42,6 @@ networkConfigHelper = mars.generate(str("{}/{}".format(os.path.dirname(__file__)
 class dynamicConfig:
     dataPath = mars.element("dataPath", dict(chain=str("{}/{}".format(os.path.dirname(__file__), files["chain"][1:] if files["chain"][0] == "/" else files["chain"])), nodes=str("{}/{}".format(os.path.dirname(__file__), files["nodes"][1:] if files["nodes"][0] == "/" else files["nodes"]))), configHelper)
     minerAddress = mars.element("minerAddress", "", configHelper)
-    frequencyBlockCheckingMining = mars.element("frequencyBlockCheckingMining", int(pow(10,3)), configHelper)
     multiprocessingMining = mars.element("multiProcessingMining", True, configHelper)
 
 class debugConfig:
@@ -67,9 +68,11 @@ class networkConfig:
 
 # Databases
 class databases:
-    chainDB = database.Database.chain()
-    nodesDB = database.Database.nodes()
-    memPool = storage.Storage.memPool()
+    # The databases manager won't load if the process is not the main
+    if str(multiprocessing.current_process().name) == "MainProcess":
+        chainDB = database.Database.chain()
+        nodesDB = database.Database.nodes()
+        memPool = storage.Storage.memPool()
 
 # Chain constants
 class chainConfig:
@@ -84,7 +87,6 @@ class chainConfig:
 
 # Mining config
 class miningConfig:
-    frequencyBlockCheckingMining = int(dynamicConfig.frequencyBlockCheckingMining.get())
     multiprocessingMining = bool(dynamicConfig.multiprocessingMining.get())
     minDiff = int(networkConfig.minDiff.get())
     maxDiff = int(networkConfig.maxDiff.get())
@@ -92,3 +94,7 @@ class miningConfig:
 # Helpers
 class helpers:
     printer, messageLevelTypes = superPrinter.printer(), superPrinter.levels
+
+# Status
+class status:
+    mine = miner.Miner.status()

@@ -17,17 +17,21 @@
 from time import perf_counter
 import random
 from . import declarations
-from . import manager
 import multiprocessing
 
 class Miner:
+    class status:
+        def __init__(self):
+            self.newBlockMined = False
+
     @staticmethod
     def start(block, difficulty, prefix, initializingTime):
         """
         Starts the miner
         """
+        declarations.status.mine.newBlockMined = False
         if declarations.miningConfig.multiprocessingMining:
-            # Define blockProcessShared object to share the blocks mined In the processes
+            # Define a process shared object to retrieve the block mined
             blockToMine = multiprocessing.Queue()
             # Make event to stop processes when one finishes
             found = multiprocessing.Event()
@@ -43,45 +47,29 @@ class Miner:
                 # Start process
                 process.start()
             # Wait until one process finishes
-            while not found.is_set(): pass
+            while not found.is_set():
+                # Check if there is a new block in the chain
+                if declarations.status.mine.newBlockMined: return False
+            # Wait for them to finish
+            for process in pools: process.join()
+            # Kill processes
+            for process in pools: process.kill()
             # Get block
             blockMined = blockToMine.get()
         else:
-            blockMined = Miner.mine(block, difficulty, prefix, initializingTime)
+            blockMined = Miner.mine(block, difficulty, prefix, initializingTime, None, None)
         # Return block mined
         if type(blockMined) is bool:
-            return bool(blockMined)
+            return False
         else:
             return dict(blockMined)
 
     @staticmethod
-    def checkMultiprocessing(event):
-        """
-        Check if multiprocessing is enabled
-        """
-        if event is None and not declarations.miningConfig.multiprocessingMining: return True
-        if event is not None and declarations.miningConfig.multiprocessingMining: return (not event.is_set())
-
-    @staticmethod
-    def mine(blockToMine, difficulty, prefix, initializingTime, passBlock=None, event=None):
-        # Declare counterToCheck
-        counterToCheck = 0
-        while Miner.checkMultiprocessing(event):
-            # Increment counterToCheck
-            counterToCheck += 1
-            # Check If the block Is already In the chain
-            try:
-                if counterToCheck == declarations.miningConfig.frequencyBlockCheckingMining:
-                    if blockToMine.blockNumber == int(manager.Manager.chainMan.getChain().get("blockNumber")):
-                        # The block Is already In the chain!
-                        if declarations.miningConfig.multiprocessingMining: passBlock.put(False)
-                        return False
-                    else: counterToCheck = 0 # Reset counter
-            except (AttributeError, TypeError):
-                pass
+    def mine(blockToMine, difficulty, prefix, initializingTime, passBlock, event):
+        while Miner.utils.checkMultiprocessing(event):
             # Stage 5 - Set the miner time
             '''
-            The miner time randomizes practically the hash, requiring more or less nonces.
+            The miner time randomizes the hash, requiring more or less nonces.
             This makes the network less dependant of powerful computers.
             '''
             blockToMine.minerTime = perf_counter() - initializingTime
@@ -99,4 +87,14 @@ class Miner:
                     # Set that one block was mined
                     event.set()
                 return blockToMine.get()
+        # If not more tries return
         return
+
+    class utils:
+        @staticmethod
+        def checkMultiprocessing(event):
+            """
+            Check if multiprocessing is enabled
+            """
+            if event is None and not declarations.miningConfig.multiprocessingMining: return True
+            if event is not None and declarations.miningConfig.multiprocessingMining: return (not event.is_set())

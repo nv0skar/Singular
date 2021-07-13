@@ -44,7 +44,7 @@ class Database:
             try:
                 path.Path.preparePath(str(declarations.staticConfig.dataPath["chain"]))
                 self.db = rocksdb.DB(str(declarations.staticConfig.dataPath["chain"]), rocksdb.Options(create_if_missing=True))
-            except (rocksdb.errors.RocksIOError): exceptions.Exceptions.Compromised("For some reason the lock file is a resource which is temporarily unavailable", True)
+            except (rocksdb.errors.RocksIOError): exceptions.Exceptions.Compromised("For some reason the chain's lock file is temporarily unavailable", True)
             self.chainLength = self.__lengthManager(init=True); self.__lastBlock = None
 
         def __lengthManager(self, operation=None, init=False):
@@ -106,7 +106,7 @@ class Database:
             try:
                 path.Path.preparePath(str(declarations.staticConfig.dataPath["nodes"]))
                 self.db = rocksdb.DB(str(declarations.staticConfig.dataPath["nodes"]), rocksdb.Options(create_if_missing=True))
-            except (rocksdb.errors.RocksIOError): exceptions.Exceptions.Compromised("For some reason the lock file is a resource which is temporarily unavailable", True)
+            except (rocksdb.errors.RocksIOError): exceptions.Exceptions.Compromised("For some reason the node's lock file is temporarily unavailable", True)
             self.nodesNumber = self.__numberManager(init=True)
 
         def __numberManager(self, operation=None, init=False):

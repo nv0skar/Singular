@@ -72,6 +72,8 @@ class Manager:
                         if clean: Manager.memPool.removeFromPool(clean=True)
                         # Add the reward to the memPool
                         if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.utils.rewardTransactionComposer(block.get("miner"), reward), True)
+                        # Mark a block as saved
+                        declarations.status.mine.newBlockMined = True
                         # Save the block
                         storage.Storage.chainMan.saveBlock(block)
                         return True
@@ -83,6 +85,8 @@ class Manager:
                     if clean: Manager.memPool.removeFromPool(clean=True)
                     # Add the reward to the memPool
                     if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.Transaction(declarations.chainConfig.rewardName, block.get("miner"), reward, "Unnecessary!").get(), True)
+                    # Mark a block as saved
+                    declarations.status.mine.newBlockMined = True
                     # Save the block
                     storage.Storage.chainMan.saveBlock(block)
                     return True

@@ -33,7 +33,6 @@ class Arguments:
         arguments.add_argument("-m", "--minerAddress", help="Pass miner address", type=str, dest="address")
         arguments.add_argument("-s", "--show", help="Display the path of the databases and the network name before start", dest="show", action="store_true")
         arguments.add_argument("-sN", "--showNetwork", help="Get network raw info", dest="showNetwork", action="store_true")
-        arguments.add_argument("-fbC", "--frequencyBlockChecking", help="Set how many times have to try a hash before checking If the block Is already mined (Higher value could result In a faster mining, but you take the risk of that block being In the chain already)", type=int, dest="frequencyBlockChecking")
         arguments.add_argument("-tmP", "--toggleMultiprocessingMining", help=("Enable multiprocessing mining" if declarations.miningConfig.multiprocessingMining is False else "Disable multiprocessing mining"), action="store_true")
         arguments.add_argument("--pathChain", help="Change the default path to save the chain (Add {path} to get the Singular path)", type=str, dest="chainPath")
         arguments.add_argument("--pathNodes", help="Change the default path to save the nodes (Add {path} to get the Singular path)", type=str, dest="nodesPath")
@@ -45,7 +44,7 @@ class Arguments:
         # Perform the tasks of the arguments
         Arguments.update(argsReturns)
         # Check if has to exit after the arguments passed
-        argsToExit = argsReturns.networkSetup or argsReturns.address or argsReturns.chainPath or argsReturns.nodesPath or argsReturns.frequencyBlockChecking or argsReturns.toggleMultiprocessingMining or argsReturns.clear or argsReturns.quit
+        argsToExit = argsReturns.networkSetup or argsReturns.address or argsReturns.chainPath or argsReturns.nodesPath or argsReturns.toggleMultiprocessingMining or argsReturns.clear or argsReturns.quit
         if argsToExit:
             # If the show argument was passed, show the paths before exiting
             if argsReturns.show: print("\nChain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
@@ -87,10 +86,6 @@ class Arguments:
             newDataPath["nodes"] = str("{}/{}".format(os.path.dirname(__file__), str(argsReturns.nodesPath)[6:])) if str(argsReturns.nodesPath)[:6] == "{path}" else str(argsReturns.nodesPath) # If {path} was added append the Singular path
             # Save newDataPath
             declarations.dynamicConfig.dataPath.set(dict(newDataPath))
-        # Check If frequencyBlockChecking was passed
-        if argsReturns.frequencyBlockChecking:
-            # Set the frequencyBlockCheckingMining
-            declarations.dynamicConfig.frequencyBlockCheckingMining.set(int(argsReturns.frequencyBlockChecking))
         # Check If toggleMultiprocessingMining was passed
         if argsReturns.toggleMultiprocessingMining:
             declarations.dynamicConfig.multiprocessingMining.set(True if declarations.miningConfig.multiprocessingMining is False else False)

@@ -14,17 +14,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
+import multiprocessing
+import signal
 from . import manager
 from . import frontend
 from . import parser
 from . import integrity
 import rich.traceback
 
+def kill(*args):
+    for process in multiprocessing.active_children():
+        try: process.kill()
+        except: os.kill(process.pid, signal.SIGKILL)
+    try: exit()
+    except: os.kill(os.getpid(), signal.SIGKILL)
+
 def main():
     """
     Parse arguments, show frontend and initialize
     """
     try:
+        # Catch SIGINT signal
+        signal.signal(signal.SIGINT, kill)
         # Set the traceback parser
         rich.traceback.install()
         # Parse arguments

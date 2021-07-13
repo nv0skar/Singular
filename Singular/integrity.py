@@ -28,7 +28,6 @@ class Integrity:
         ## Check configs
         dataPathStatus = declarations.dynamicConfig.dataPath.get() != declarations.staticConfig.dataPath
         minerAddressStatus = declarations.dynamicConfig.minerAddress.get() != declarations.staticConfig.minerAddress
-        frequencyBlockCheckingMiningStatus = declarations.dynamicConfig.frequencyBlockCheckingMining.get() != declarations.miningConfig.frequencyBlockCheckingMining
         multiprocessingMiningStatus = declarations.dynamicConfig.multiprocessingMining.get() != declarations.miningConfig.multiprocessingMining
         ## Check network configs
         networkNameStatus = declarations.networkConfig.name.get() != declarations.chainConfig.name
@@ -42,7 +41,7 @@ class Integrity:
         networkMaxDiffStatus = declarations.networkConfig.maxDiff.get() != declarations.miningConfig.maxDiff
         networkTestNetStatus = declarations.networkConfig.testNet.get() != declarations.chainConfig.testNet
         # Check all the status
-        if dataPathStatus or minerAddressStatus or frequencyBlockCheckingMiningStatus or multiprocessingMiningStatus or networkNameStatus or networkBootstrapIPStatus or networkMagicNumberStatus or networkMaxSupplyStatus or networkBlockMaxRewardStatus or networkRewardNameStatus or networkMaxAmountStatus or networkMinDiffStatus or networkMaxDiffStatus or networkTestNetStatus:
+        if dataPathStatus or minerAddressStatus or multiprocessingMiningStatus or networkNameStatus or networkBootstrapIPStatus or networkMagicNumberStatus or networkMaxSupplyStatus or networkBlockMaxRewardStatus or networkRewardNameStatus or networkMaxAmountStatus or networkMinDiffStatus or networkMaxDiffStatus or networkTestNetStatus:
             if not (networkMinDiffStatus or networkMaxDiffStatus and declarations.debugConfig.debug):
                     exceptions.Exceptions.Compromised("Inconsistent constant status", True)
         # Check the integrity of the settings

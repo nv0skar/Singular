@@ -16,6 +16,6 @@
 
 import Singular
 
-class init:
-    # Initialize Singular
+# Initialize Singular
+if __name__ == "__main__":
     Singular.main.main()
