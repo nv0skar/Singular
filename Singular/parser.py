@@ -20,6 +20,7 @@ from . import manager
 from . import frontend
 from . import network
 from . import helper
+from . import test
 import argparse
 import base64
 
@@ -38,18 +39,19 @@ class Arguments:
         arguments.add_argument("--pathNodes", help="Change the default path to save the nodes (Add {path} to get the Singular path)", type=str, dest="nodesPath")
         arguments.add_argument("--clear", help="Delete the databases contents", action="store_true")
         arguments.add_argument("-nS", "--networkSetup", help="Prompt the Network Setup Agent", action="store_true")
+        arguments.add_argument("-t", "--test", help="Perform the tests", action="store_true")
         arguments.add_argument("-d", "--debug", help="Enables debug mode", action="store_true")
         arguments.add_argument("-q", "--quit", help="Exit", action="store_true")
         argsReturns = arguments.parse_args()
         # Perform the tasks of the arguments
         Arguments.update(argsReturns)
         # Check if has to exit after the arguments passed
-        argsToExit = argsReturns.networkSetup or argsReturns.address or argsReturns.chainPath or argsReturns.nodesPath or argsReturns.toggleMultiprocessingMining or argsReturns.clear or argsReturns.quit
+        argsToExit = argsReturns.networkSetup or argsReturns.address or argsReturns.chainPath or argsReturns.nodesPath or argsReturns.toggleMultiprocessingMining or argsReturns.clear or argsReturns.test or argsReturns.quit
         if argsToExit:
             # If the show argument was passed, show the paths before exiting
             if argsReturns.show: print("\nChain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
             # If the showNetwork argument was passed, show the network info before exiting
-            if argsReturns.showNetwork: print("Network settings: {}\nEncoded version: {}".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
+            if argsReturns.showNetwork: print("Network settings: {}\nEncoded version: {}\n".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
             exit()
         return argsReturns
 
@@ -58,19 +60,19 @@ class Arguments:
         """
         Check the arguments passed
         """
-        # Check If debug was passed
+        # Check if debug was passed
         if argsReturns.debug:
             # Activate debug mode
             helper.enableDebug()
-        # Check If network setup was passed
+        # Check if network setup was passed
         if argsReturns.networkSetup:
             # Initialize network setup agent
             frontend.Frontend.setup.network()
-        # Check If the minerAddress argument was passed
+        # Check if the minerAddress argument was passed
         if argsReturns.address:
             # Set the minerAddress
             declarations.dynamicConfig.minerAddress.set(str(argsReturns.address))
-        # Check If chainPath was passed
+        # Check if chainPath was passed
         if argsReturns.chainPath:
             # Declare the newDataPath
             newDataPath = declarations.staticConfig.dataPath
@@ -78,7 +80,7 @@ class Arguments:
             newDataPath["chain"] = str("{}/{}".format(os.path.dirname(__file__), str(argsReturns.chainPath)[6:])) if str(argsReturns.chainPath)[:6] == "{path}" else str(argsReturns.chainPath) # If {path} was added append the Singular path
             # Save newDataPath
             declarations.dynamicConfig.dataPath.set(dict(newDataPath))
-        # Check If nodesPath was passed
+        # Check if nodesPath was passed
         if argsReturns.nodesPath:
             # Declare the newDataPath
             newDataPath = declarations.staticConfig.dataPath
@@ -89,11 +91,15 @@ class Arguments:
         # Check If toggleMultiprocessingMining was passed
         if argsReturns.toggleMultiprocessingMining:
             declarations.dynamicConfig.multiprocessingMining.set(True if declarations.miningConfig.multiprocessingMining is False else False)
-        # Check If clear was passed
+        # Check if clear was passed
         if argsReturns.clear:
             # Remove chain
             if manager.Manager.chainMan.clearChain(): print("Chain deleted from the database successfully!")
-            else: print("There was some error while trying to delete chain from the database")
+            else: print("There was some error while trying to delete the chain from the database")
             if manager.Manager.nodesMan.clearNodes(): print("Nodes deleted from the database successfully!")
             else: print("There was some error while trying to delete the nodes from the database")
+        # Check if test was passes
+        if argsReturns.test:
+            # Execute tests
+            test.Test.performTests()
         return

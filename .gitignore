@@ -7,7 +7,9 @@ network.json
 Singular/config.plist
 Singular/network.json
 data/
+tests/
 Singular/data/
+Singular/tests/
 build/
 dist/
 Singular.egg-info/

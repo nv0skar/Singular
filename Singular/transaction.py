@@ -34,9 +34,9 @@ class Transaction:
         self.signature = signature
 
     def compose(self):
-        '''
+        """
         Compose the transaction into a string with the transaction data in It.
-        '''
+        """
         return str("({}-{}-{}-{})@{}".format(self.sender,self.receiver,float(self.realAmount),float(self.amount), self.time))
 
     def verify(self):
@@ -64,7 +64,11 @@ class Transaction:
             address = base64.b16decode(self.sender)
             signature = base64.b16decode(self.signature)
             # Get the verification key
-            verification = nacl.signing.VerifyKey(bytes(address))
+            try:
+                verification = nacl.signing.VerifyKey(bytes(address))
+            except (ValueError) as e:
+                helper.report("Transaction verifier", str(e))
+                return False
             # Checks the message
             try:
                 verification.verify(str(self.compose()).encode(), signature)

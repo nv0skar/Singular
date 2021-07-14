@@ -41,7 +41,7 @@ class Frontend:
             # Show path If the show argument was passed
             if passedArguments.show: print("Chain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
             # Show the network info, If the showNetwork argument was passed
-            if passedArguments.showNetwork: print("Network settings: {}\nEncoded version: {}".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
+            if passedArguments.showNetwork: print("Network settings: {}\nEncoded version: {}\n".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
         pass
 
     class setup:

@@ -98,3 +98,4 @@ class helpers:
 # Status
 class status:
     mine = miner.Miner.status()
+    testMode = False

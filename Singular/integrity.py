@@ -24,6 +24,8 @@ class Integrity:
         """
         Check the integrity of the system
         """
+        # Bypass the integrity check if test mode is enabled
+        if declarations.status.testMode: return
         # Check that the dynamic data are the same that the ones in memory
         ## Check configs
         dataPathStatus = declarations.dynamicConfig.dataPath.get() != declarations.staticConfig.dataPath
