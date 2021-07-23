@@ -17,6 +17,7 @@
 import os
 import multiprocessing
 import signal
+from . import declarations
 from . import manager
 from . import frontend
 from . import parser
@@ -24,6 +25,10 @@ from . import integrity
 import rich.traceback
 
 def kill(*args):
+    """
+    Terminate process
+    """
+    # Terminate all the subprocesses
     for process in multiprocessing.active_children():
         try: process.kill()
         except: os.kill(process.pid, signal.SIGKILL)

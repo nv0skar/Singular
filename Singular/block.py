@@ -32,7 +32,7 @@ class Block:
         self.miner = None
         self.time = getTime()
         self.minerTime = None
-        self.protocolVersion = declarations.protocolVersion
+        self.protocolVersion = declarations.core.protocolVersion
         self.networkMagicNumber = declarations.chainConfig.magicNumber
 
     def hashBlock(self):

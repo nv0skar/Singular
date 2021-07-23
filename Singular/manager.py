@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import multiprocessing
 from . import declarations
 from . import chain
 from . import block as bl
@@ -22,8 +23,8 @@ from . import p2p
 from . import storage
 from . import integrity
 from . import helper
+from . import endpoint
 from . import frontend
-import multiprocessing
 
 class Manager:
     class chainMan:
@@ -145,10 +146,12 @@ class Manager:
             # Check integrity
             integrity.Integrity.check()
             # Get the height of the chain, and check if there are any blocks. If doesn't, ask to start a new chain
-            if int(Manager.chainMan.getHeight()) == 0:
-                if not bool(frontend.Frontend.dialogs.startChain()): exit()
-            # Sync the chain, and not continue until there is no error
-            # TODO - Implement networking
+            try:
+                if (int(Manager.chainMan.getHeight()) == 0) and (not bool(frontend.Frontend.dialogs.startChain())): exit()
+            except (AttributeError, TypeError, ValueError): declarations.helpers.printer.sprint("main", "There was an error while checking the the chain height. Chain height check was performed to ask if should start a new chain.")
+            # Start the server
+            endpoint.Endpoint.init()
+            # TODO - Sync the chain, and not continue until there is no error
             # Initialize
             while True:
                 routine = Manager.protocol.go()

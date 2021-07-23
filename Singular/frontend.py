@@ -23,7 +23,6 @@ import base64
 import cfonts
 from rich.prompt import Prompt, Confirm
 from rich.console import Console, Style
-import superPrinter
 
 class Frontend:
     @staticmethod
@@ -36,7 +35,7 @@ class Frontend:
         # Show name
         print(cfonts.render('Singular', colors=["#8b00a6", '#4328a6'], align='center'))
         # Show info
-        print("{} - {}\nCtrl-C to exit\n".format(declarations.info.get("version"), declarations.info.get("url")))
+        print("{} - {}\nCtrl-C to exit\n".format(str(declarations.core.version), str(declarations.core.url)))
         if passedArguments is not None:
             # Show path If the show argument was passed
             if passedArguments.show: print("Chain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))

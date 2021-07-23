@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+__name__ = "SingularNode"
 __version__ = "0.0.1"
-__url__ = "https://github.com/ItsTheGuy/Singular"
 __protocolVersion__ = 1
+__url__ = "https://github.com/ItsTheGuy/Singular"
 
 # Default network constants
 defaultNetwork = {
-    "name":"mainSpace",
+    "name": "mainSpace",
     "bootstrapIP": "",
     "magicNumber": "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib",
     "maxSupply": 10000000000,
@@ -30,4 +31,10 @@ defaultNetwork = {
     "minDiff": 4,
     "maxDiff": 32,
     "testNet": True
+}
+
+# Default networking constants
+
+defaultNetworking = {
+    "port": "1004"
 }

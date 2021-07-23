@@ -3,5 +3,7 @@ numpy>=1.19.5
 PyNaCl>=1.4.0
 nanoid>=2.0.0
 rocksdb>=0.7.0
+flask>=2.0.1
+waitress>=2.0.0
 rich>=9.11.0
 python-cfonts>=1.4.0

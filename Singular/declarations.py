@@ -23,13 +23,17 @@ from . import miner
 import mars
 import superPrinter
 
+# Core info
+class core:
+    name = str(globals.__name__)
+    version = str(globals.__version__)
+    protocolVersion = str(globals.__protocolVersion__)
+    url = str(globals.__url__)
+    agent = "{}@v{}".format(str(name), str(protocolVersion))
+    class networking: defaultPort = globals.defaultNetworking.get("port")
+
 # Network constants
 defaultNetwork = dict(globals.defaultNetwork)
-
-# Info
-info = dict(version=str(globals.__version__), url=str(globals.__url__))
-nodeAgent = "SingularNode@V{}".format(str(globals.__version__))
-protocolVersion = int(globals.__protocolVersion__)
 
 # Declarations
 files = dict(config="config.plist", networkConfig="network.json", chain="data/chain", nodes="data/nodes")
@@ -98,4 +102,5 @@ class helpers:
 # Status
 class status:
     mine = miner.Miner.status()
+    walletServer = None
     testMode = False
