@@ -20,6 +20,7 @@ from . import manager
 from flask import Flask
 from flask import request
 from flask import jsonify
+from werkzeug.exceptions import HTTPException
 from waitress import serve
 
 endpoint = Flask(str(declarations.core.agent))
@@ -45,7 +46,7 @@ class Endpoint:
         # Start the server
         serve(endpoint, host="0.0.0.0", port=int(declarations.core.networking.defaultPort))
 
-    class wallet:
+    class globals:
         @staticmethod
         @endpoint.route("/", methods=["GET"])
         async def info():
@@ -54,6 +55,15 @@ class Endpoint:
             """
             return jsonify({"network": str(declarations.chainConfig.name), "networkMagicNumber": str(declarations.chainConfig.magicNumber), "protocolVersion": str(declarations.core.protocolVersion), "agent": str(declarations.core.agent)}), 200
 
+        @staticmethod
+        @endpoint.errorhandler(HTTPException)
+        def handle_exception(error):
+            """
+            Return JSON instead of HTML for HTTP errors.
+            """
+            return jsonify({"code": error.code, "name": error.name, "description": error.description})
+
+    class wallet:
         @staticmethod
         @endpoint.route("/wallet/balance/<wallet>", methods=["GET"])
         async def getBalance(wallet):
@@ -79,5 +89,5 @@ class Endpoint:
             """
             try: transactionManagerResponse = manager.Manager.wallet.transaction(request.json("sender"), request.json("receiver"), request.json("realAmount"), request.json("signature"), request.json("time"))
             except (AttributeError, TypeError, ValueError): return jsonify({"status": "failed", "reason": "Invalid message format"}), 400
-            if transactionManagerResponse: return jsonify({"status": "success"}), 200
+            if transactionManagerResponse: return jsonify({"status": "success", "reason": "Apparently everything went fine ;)"}), 200
             else: return jsonify({"status": "failed", "reason": "Transaction confirmation failed"}), 400
