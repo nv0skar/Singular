@@ -63,6 +63,8 @@ class Test:
         declarations.staticConfig.dataPath["nodes"] = str(nodesPathTmp)
         # Delete the networkMagicNumber
         declarations.chainConfig.magicNumber = "testMode"
+        # Set the rewardName
+        declarations.chainConfig.rewardName = "test"
         # Redeclare the databases objects to make the new path take effect
         declarations.helpers.printer.sprint("test", "Reinitializing databases managers")
         declarations.databases.chainDB = database.Database.chain()
@@ -93,7 +95,13 @@ class Test:
         Test.blockGenerator(True)
         # Check if the transaction was added
         declarations.helpers.printer.sprint("test", "Checking if the transaction was added")
-        lastBlockAdded = manager.Manager.chainMan.getChain().get("transactions")[1]
-        if lastBlockAdded.get("sender") == str(addresses[0].get("encodedPubKey").decode()) and lastBlockAdded.get("receiver") == str(addresses[1].get("encodedPubKey").decode()):
+        lastBlockAdded = manager.Manager.chainMan.getChain()
+        madeTransactionLastBlockAdded = lastBlockAdded.get("transactions")[1]
+        if madeTransactionLastBlockAdded.get("sender") == str(addresses[0].get("encodedPubKey").decode()) and madeTransactionLastBlockAdded.get("receiver") == str(addresses[1].get("encodedPubKey").decode()):
                     declarations.helpers.printer.sprint("test", "Transaction in the chain")
+        else: declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Transaction weren't in the chain"); return
+        # Check if the reward transactions were duplicated
+        if (lastBlockAdded.get("transactions")[0].get("sender") == str(declarations.chainConfig.rewardName)) and (lastBlockAdded.get("transactions")[1].get("sender") != str(declarations.chainConfig.rewardName)):
+            declarations.helpers.printer.sprint("test", "Reward transaction not duplicated")
+        else: declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Reward transaction duplicated"); return
         declarations.helpers.printer.sprint("test", "Tests successfully passed!")

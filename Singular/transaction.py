@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from time import time as getTime
+import time as getTime
 from . import declarations
 from . import manager
 from . import formulae
@@ -24,7 +24,7 @@ import nacl.signing, nacl.exceptions
 import binascii
 
 class Transaction:
-    def __init__(self, sender, receiver, realAmount, signature=None, time=getTime()):
+    def __init__(self, sender, receiver, realAmount, signature=None, time=getTime.time()):
         self.sender = sender
         self.receiver = receiver
         self.realAmount = float(realAmount)
@@ -145,22 +145,22 @@ class utils:
         """
         Compose reward transaction
         """
-        return Transaction(declarations.chainConfig.rewardName, miner, reward, "Unnecessary!").get()
+        return Transaction(declarations.chainConfig.rewardName, miner, reward, "Unnecessary!", getTime.time()).get()
 
     @staticmethod
-    def prepare(transactions, check=False):
+    def prepare(transactions, check=True):
         """
         Prepare transactions to be added to the chain
         """
         # Get all transactions of the memPool
         transactionsMemPool = list(transactions)
-        # Check if the reward transaction of the last block is added if check is False
-        if not check and (manager.Manager.chainMan.getHeight()) != 0:
+        # Check if the reward transaction of the last block is added if check is true
+        if check and ((manager.Manager.chainMan.getHeight()) != 0):
             lastBlock = manager.Manager.chainMan.getChain()
             lastBlockInfo = dict(miner=lastBlock.get("miner"), reward=formulae.Formulae.calculateReward(lastBlock.get("transactions"), lastBlock.get("blockNumber")))
             rewardTransInMemPool = False
             for trans in transactionsMemPool:
-                if str(trans.get("sender")) == str(lastBlockInfo.get("miner")): rewardTransInMemPool = True; break
+                if str(trans.get("receiver")) == str(lastBlockInfo.get("miner")): rewardTransInMemPool = True; break
             if not rewardTransInMemPool: transactionsMemPool.append(utils.rewardTransactionComposer(str(lastBlockInfo.get("miner")), str(lastBlockInfo.get("reward"))))
         # For each transaction make some checks
         for trans in list(transactionsMemPool):

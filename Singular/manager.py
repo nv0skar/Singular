@@ -17,7 +17,7 @@
 import multiprocessing
 from . import declarations
 from . import chain
-from . import block as bl
+from . import block
 from . import transaction
 from . import p2p
 from . import storage
@@ -45,7 +45,7 @@ class Manager:
             try:
                 storage.Storage.chainMan.clearChain()
                 return True
-            except: return False
+            except (declarations.helpers.baseExceptions): return False
 
         @staticmethod
         def getChain(blockNumber=None):
@@ -56,36 +56,34 @@ class Manager:
             return storage.Storage.chainMan.getBlock(blockNumber)
 
         @staticmethod
-        def addToChain(block, verify=True, addReward=False, reward=0, clean=False):
+        def addToChain(blockToAdd, verify=True, addReward=False, reward=0, clean=False):
             """
             Add the block to the chain.
             This function Is on top of the saveBlock function in Storage.
             """
             try:
-                # Check If the blockNumber of the block to add Is already taken by a block In the chain
+                # Check if the blockNumber of the block to add Is already taken by a block In the chain
                 for blockCheckNumber in range(Manager.chainMan.getHeight()):
                     blockCheck = Manager.chainMan.getChain(blockCheckNumber)
-                    if blockCheck.get("blockNumber") == block.get("blockNumber"): return False
+                    if blockCheck.get("blockNumber") == blockToAdd.get("blockNumber"): return False
                 # Verify the block
                 if verify:
-                    if bl.utils.verify(block.get("blockNumber"), block.get("transactions"), block.get("time"), block.get("nonce"), block.get("miner"), block.get("minerTime"), block.get("hash"), block.get("protocolVersion")) is True:
+                    if block.utils.verify(blockToAdd.get("blockNumber"), blockToAdd.get("transactions"), blockToAdd.get("time"), blockToAdd.get("nonce"), blockToAdd.get("miner"), blockToAdd.get("minerTime"), blockToAdd.get("hash"), blockToAdd.get("protocolVersion")) is True:
                         # Remove confirmed transactions from memPool
                         if clean: Manager.memPool.removeFromPool(clean=True)
                         # Add the reward to the memPool
-                        if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.utils.rewardTransactionComposer(block.get("miner"), reward), True)
+                        if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.utils.rewardTransactionComposer(blockToAdd.get("miner"), reward), True)
                         # Mark a block as saved
                         declarations.status.mine.newBlockMined = True
                         # Save the block
-                        storage.Storage.chainMan.saveBlock(block)
+                        storage.Storage.chainMan.saveBlock(blockToAdd)
                         return True
-                    else:
-                        helper.report("Chain manager", "Block verification failed")
-                        return False
+                    else: helper.report("Chain manager", "Block verification failed"); return False
                 else:
                     # Remove confirmed transactions from memPool
                     if clean: Manager.memPool.removeFromPool(clean=True)
                     # Add the reward to the memPool
-                    if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.Transaction(declarations.chainConfig.rewardName, block.get("miner"), reward, "Unnecessary!").get(), True)
+                    if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.Transaction(declarations.chainConfig.rewardName, blockToAdd.get("miner"), reward, "Unnecessary!").get(), True)
                     # Mark a block as saved
                     declarations.status.mine.newBlockMined = True
                     # Save the block
@@ -105,7 +103,7 @@ class Manager:
             try:
                 storage.Storage.nodesMan.addNode(node)
                 return True
-            except: return False
+            except (declarations.helpers.baseExceptions): return False
 
         @staticmethod
         def removeNode(nodeNumber):
@@ -116,7 +114,7 @@ class Manager:
             try:
                 storage.Storage.nodesMan.removeNode(nodeNumber)
                 return True
-            except: return False
+            except (declarations.helpers.baseExceptions): return False
 
         @staticmethod
         def getNodes():
@@ -135,7 +133,7 @@ class Manager:
             try:
                 storage.Storage.nodesMan.clearNodes()
                 return True
-            except: return False
+            except (declarations.helpers.baseExceptions): return False
 
     class protocol:
         @staticmethod
@@ -148,7 +146,7 @@ class Manager:
             # Get the height of the chain, and check if there are any blocks. If doesn't, ask to start a new chain
             try:
                 if (int(Manager.chainMan.getHeight()) == 0) and (not bool(frontend.Frontend.dialogs.startChain())): exit()
-            except (AttributeError, TypeError, ValueError): declarations.helpers.printer.sprint("main", "There was an error while checking the the chain height. Chain height check was performed to ask if should start a new chain.")
+            except (declarations.helpers.baseExceptions): declarations.helpers.printer.sprint("main", "There was an error while checking the the chain height. Chain height check was performed to ask if should start a new chain.")
             # Start the server
             endpoint.Endpoint.init()
             # TODO - Sync the chain, and not continue until there is no error
@@ -185,7 +183,7 @@ class Manager:
             # Get unconfirmed transactions
             unconfirmedTransacts = Manager.memPool.getFromPool()
             # Generate block
-            blockToMine = bl.Block(unconfirmedTransacts)
+            blockToMine = block.Block(unconfirmedTransacts)
             # Mine block
             minedBlock, rewardMiner = chain.Chain.mine(blockToMine, autoCleanMemPool=False)
             # Check If block was mined or not
@@ -211,26 +209,26 @@ class Manager:
             return declarations.databases.memPool.getFromPool()
 
         @staticmethod
-        def addToPool(transaction, bigBangAdd=False):
+        def addToPool(transactionToAdd, bigBangAdd=False):
             """
             Add unconfirmed transaction.
             This function Is on top of the addToPool function in Storage.memPool
             """
-            # Before adding If the sender Is bigBang check out If the amount Is valid
-            if transaction.get("sender") == "bigBang" or transaction.get("receiver") == "bigBang":
+            # Before adding, if the sender is the reward name check out if the amount is valid
+            if transactionToAdd.get("sender") == str(declarations.chainConfig.rewardName) or transactionToAdd.get("receiver") == str(declarations.chainConfig.rewardName):
                 if not bigBangAdd: return False
-            try: declarations.databases.memPool.addToPool(transaction); return True
-            except: return False
+            try: declarations.databases.memPool.addToPool(transactionToAdd); return True
+            except (declarations.helpers.baseExceptions): return False
 
         @staticmethod
-        def removeFromPool(clean=False, transaction=None):
+        def removeFromPool(clean=False, transactionToRemove=None):
             """
             Remove unconfirmed transaction.
             This function Is on top of the removeFromPool function in Storage.memPool
             """
             # Check If have to clean all the memPool
             if clean: declarations.databases.memPool.clearPool(); return True
-            else: declarations.databases.memPool.removeFromPool(transaction)
+            else: declarations.databases.memPool.removeFromPool(transactionToRemove)
 
     class wallet:
         @staticmethod
@@ -244,9 +242,9 @@ class Manager:
             transactions = []
             # Get all the transactions that the sender or the receiver is the wallet
             for blockNumber in range(Manager.chainMan.getHeight()):
-                block = Manager.chainMan.getChain(blockNumber)
-                for trans in block.get("transactions"):
-                    if trans.get("sender") == wallet or trans.get("receiver") == wallet :
+                blockCheck = Manager.chainMan.getChain(blockNumber)
+                for trans in blockCheck.get("transactions"):
+                    if (trans.get("sender") == wallet) or (trans.get("receiver") == wallet):
                         transactions.append(trans)
             # Now calculate the balance
             for walletTransaction in transactions:
@@ -267,9 +265,9 @@ class Manager:
             transactions = []
             # Get all the transactions that the sender or the receiver is the wallet
             for blockNumber in range(Manager.chainMan.getHeight()):
-                block = Manager.chainMan.getChain(blockNumber)
-                for trans in block.get("transactions"):
-                    if trans.get("sender") == wallet or trans.get("receiver") == wallet:
+                blockCheck = Manager.chainMan.getChain(blockNumber)
+                for trans in blockCheck.get("transactions"):
+                    if (trans.get("sender") == wallet) or (trans.get("receiver") == wallet):
                         transactions.append(trans)
             # Return all the transactions
             return transactions

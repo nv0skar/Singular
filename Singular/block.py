@@ -85,8 +85,8 @@ class utils:
         reconstructor.time = time
         # Stage 1 - Set the miner address as the miner who mined the block
         reconstructor.miner = miner
-        # Stage 2 - Prepare transactions transactions to be added to the block
-        reconstructor.transactions = transaction.utils.prepare(reconstructor.transactions, True)
+        # Stage 2 - Prepare transactions to be added to the block
+        reconstructor.transactions = transaction.utils.prepare(reconstructor.transactions, False)
         try:
             # Stage 3 - Get the previous block hash, and set protocol
             reconstructor.protocolVersion = protocolVersion
