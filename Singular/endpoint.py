@@ -45,6 +45,7 @@ class Endpoint:
         # Disable the reloader
         endpoint.use_reloader = False
         # Start the server
+        declarations.helpers.printer.sprint("main", "Initializing Web API on port {}".format(int(declarations.core.networking.defaultPort)))
         serve(endpoint, host="0.0.0.0", port=int(declarations.core.networking.defaultPort))
 
     class globals:

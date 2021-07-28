@@ -234,21 +234,15 @@ class Manager:
         @staticmethod
         def getBalance(wallet):
             """
-            Get the balance of wallet based on the transactions
+            Get the balance of a wallet based on the transactions
             """
             # Define a var to save the balance
             balance = 0
-            # Define a list to append the transactions that the requested wallet have done
-            transactions = []
             # Get all the transactions that the sender or the receiver is the wallet
-            for blockNumber in range(Manager.chainMan.getHeight()):
-                blockCheck = Manager.chainMan.getChain(blockNumber)
-                for trans in blockCheck.get("transactions"):
-                    if (trans.get("sender") == wallet) or (trans.get("receiver") == wallet):
-                        transactions.append(trans)
+            transactions = Manager.wallet.getTransactions(str(wallet))
             # Now calculate the balance
             for walletTransaction in transactions:
-                # If the wallet Is the sender rest the amount of transaction and If It's the receiver sim the amount of transaction
+                # If the wallet is the sender rest the amount of transaction and if it's the receiver sum the amount of transaction
                 if walletTransaction.get("sender") == wallet:
                     balance -= walletTransaction.get("amount")
                 elif walletTransaction.get("receiver") == wallet:
@@ -275,7 +269,7 @@ class Manager:
         @staticmethod
         def transaction(sender, receiver, realAmount, signature, time):
             """
-            Generate a transaction by appending It to the unconfirmed transactions list
+            Generate a transaction by appending it to the unconfirmed transactions list
             """
             # Check If the sender or the receiver Is the reward name
             if sender == declarations.chainConfig.rewardName or receiver == declarations.chainConfig.rewardName: return False

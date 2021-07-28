@@ -14,12 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import time
 from . import manager
 from . import miner
 from . import block as bl
 from . import formulae
-from . import helper
-from time import perf_counter
 
 class Chain:
     @staticmethod
@@ -34,7 +33,7 @@ class Chain:
         # Defines the prefix of the hash according to the difficulty
         prefix = "0" * difficulty
         # Counts how much time takes to calculate the nonce
-        initializingTime = perf_counter()
+        initializingTime = float(time.time())
         # Initialize miner
         blockMined = miner.Miner.start(blockToMine, difficulty, prefix, initializingTime)
         # Check If the block was mined

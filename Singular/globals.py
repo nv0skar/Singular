@@ -36,5 +36,5 @@ defaultNetwork = {
 # Default networking constants
 
 defaultNetworking = {
-    "port": "1004"
+    "port": 1004
 }

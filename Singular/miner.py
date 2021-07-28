@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from time import perf_counter
+import time
 import random
 from . import declarations
 import multiprocessing
@@ -72,7 +72,7 @@ class Miner:
             The miner time randomizes the hash, requiring more or less nonces.
             This makes the network less dependant of powerful computers.
             '''
-            blockToMine.minerTime = perf_counter() - initializingTime
+            blockToMine.minerTime = float(time.time()) - initializingTime
             # Stage 6 - Set the nonce
             '''
             The following line calculate a random nonce to use each time
