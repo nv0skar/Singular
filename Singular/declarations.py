@@ -97,6 +97,7 @@ class miningConfig:
 class helpers:
     printer, messageLevelTypes = superPrinter.printer(), superPrinter.levels
     baseExceptions = (AttributeError, TypeError, ValueError)
+    updateExceptions = (AttributeError, TypeError, ValueError, PermissionError, FileNotFoundError)
 
 # Status
 class status:

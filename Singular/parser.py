@@ -67,11 +67,13 @@ class Arguments:
         # Check if network setup was passed
         if argsReturns.networkSetup:
             # Initialize network setup agent
-            frontend.Frontend.setup.network()
+            try: frontend.Frontend.setup.network()
+            except declarations.helpers.updateExceptions as error: print("Unable to update network settings because of the file's permissions. Error: {}".format(error))
         # Check if the minerAddress argument was passed
         if argsReturns.address:
             # Set the minerAddress
-            declarations.dynamicConfig.minerAddress.set(str(argsReturns.address))
+            try: declarations.dynamicConfig.minerAddress.set(str(argsReturns.address))
+            except declarations.helpers.updateExceptions as error: print("Unable to update miner address because of the file's permissions".format(error))
         # Check if chainPath was passed
         if argsReturns.chainPath:
             # Declare the newDataPath
@@ -79,7 +81,8 @@ class Arguments:
             # Update newDataPath with the new chainPath
             newDataPath["chain"] = str("{}/{}".format(os.path.dirname(__file__), str(argsReturns.chainPath)[6:])) if str(argsReturns.chainPath)[:6] == "{path}" else str(argsReturns.chainPath) # If {path} was added append the Singular path
             # Save newDataPath
-            declarations.dynamicConfig.dataPath.set(dict(newDataPath))
+            try: declarations.dynamicConfig.dataPath.set(dict(newDataPath))
+            except declarations.helpers.updateExceptions as error: print("Unable to set chain path because of the file's permissions. Error: {}".format(error))
         # Check if nodesPath was passed
         if argsReturns.nodesPath:
             # Declare the newDataPath
@@ -87,10 +90,12 @@ class Arguments:
             # Update newDataPath with the new nodesPath
             newDataPath["nodes"] = str("{}/{}".format(os.path.dirname(__file__), str(argsReturns.nodesPath)[6:])) if str(argsReturns.nodesPath)[:6] == "{path}" else str(argsReturns.nodesPath) # If {path} was added append the Singular path
             # Save newDataPath
-            declarations.dynamicConfig.dataPath.set(dict(newDataPath))
+            try: declarations.dynamicConfig.dataPath.set(dict(newDataPath))
+            except declarations.helpers.updateExceptions as error: print("Unable to set nodes path. Error: {}".format(error))
         # Check If toggleMultiprocessingMining was passed
         if argsReturns.toggleMultiprocessingMining:
-            declarations.dynamicConfig.multiprocessingMining.set(True if declarations.miningConfig.multiprocessingMining is False else False)
+            try: declarations.dynamicConfig.multiprocessingMining.set(True if declarations.miningConfig.multiprocessingMining is False else False)
+            except declarations.helpers.updateExceptions as error: print("Unable to toggle multiprocessing mining. Error: {}".format(error))
         # Check if clear was passed
         if argsReturns.clear:
             # Remove chain
