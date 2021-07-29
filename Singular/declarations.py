@@ -17,6 +17,7 @@
 import os
 import multiprocessing
 from . import globals
+from . import mapping
 from . import database
 from . import storage
 from . import miner
@@ -32,9 +33,6 @@ class core:
     agent = "{}@v{}".format(str(name), str(protocolVersion))
     class networking: defaultPort = globals.defaultNetworking.get("port")
 
-# Network constants
-defaultNetwork = dict(globals.defaultNetwork)
-
 # Declarations
 files = dict(config="config.plist", networkConfig="network.json", chain="data/chain", nodes="data/nodes")
 
@@ -44,9 +42,9 @@ networkConfigHelper = mars.generate(str("{}/{}".format(os.path.dirname(__file__)
 
 # Config
 class dynamicConfig:
-    dataPath = mars.element("dataPath", dict(chain=str("{}/{}".format(os.path.dirname(__file__), files["chain"][1:] if files["chain"][0] == "/" else files["chain"])), nodes=str("{}/{}".format(os.path.dirname(__file__), files["nodes"][1:] if files["nodes"][0] == "/" else files["nodes"]))), configHelper)
-    minerAddress = mars.element("minerAddress", "", configHelper)
-    multiprocessingMining = mars.element("multiProcessingMining", True, configHelper)
+    dataPath = mars.element(mapping.Commons.dataPath, dict(chain=str("{}/{}".format(os.path.dirname(__file__), files["chain"][1:] if files["chain"][0] == "/" else files["chain"])), nodes=str("{}/{}".format(os.path.dirname(__file__), files["nodes"][1:] if files["nodes"][0] == "/" else files["nodes"]))), configHelper)
+    minerAddress = mars.element(mapping.Commons.minerAddress, "", configHelper)
+    multiprocessingMining = mars.element(mapping.Commons.multiprocessingMining, True, configHelper)
 
 class debugConfig:
     debug = False
@@ -59,16 +57,16 @@ class staticConfig:
 
 # Network config
 class networkConfig:
-    name = mars.element("name", defaultNetwork.get("name"), networkConfigHelper)
-    bootstrapIP = mars.element("bootstrapIP", defaultNetwork.get("bootstrapIP"), networkConfigHelper)
-    magicNumber = mars.element("magicNumber", defaultNetwork.get("magicNumber"), networkConfigHelper)
-    maxSupply = mars.element("maxSupply", defaultNetwork.get("maxSupply"), networkConfigHelper)
-    blockMaxReward = mars.element("blockMaxReward", defaultNetwork.get("blockMaxReward"), networkConfigHelper)
-    rewardName = mars.element("rewardName", defaultNetwork.get("rewardName"), networkConfigHelper)
-    maxAmount = mars.element("maxAmount", defaultNetwork.get("maxAmount"), networkConfigHelper)
-    minDiff = mars.element("minDiff", defaultNetwork.get("minDiff"), networkConfigHelper)
-    maxDiff = mars.element("maxDiff", defaultNetwork.get("maxDiff"), networkConfigHelper)
-    testNet = mars.element("testNet", defaultNetwork.get("testNet"),  networkConfigHelper)
+    name = mars.element(mapping.Network.name, globals.defaultNetwork.get(mapping.Network.name), networkConfigHelper)
+    bootstrapIP = mars.element(mapping.Network.bootstrapIP, globals.defaultNetwork.get(mapping.Network.bootstrapIP), networkConfigHelper)
+    magicID = mars.element(mapping.Network.magicID, globals.defaultNetwork.get(mapping.Network.magicID), networkConfigHelper)
+    maxSupply = mars.element(mapping.Network.maxSupply, globals.defaultNetwork.get(mapping.Network.maxSupply), networkConfigHelper)
+    blockMaxReward = mars.element(mapping.Network.blockMaxReward, globals.defaultNetwork.get(mapping.Network.blockMaxReward), networkConfigHelper)
+    rewardName = mars.element(mapping.Network.rewardName, globals.defaultNetwork.get(mapping.Network.rewardName), networkConfigHelper)
+    maxAmount = mars.element(mapping.Network.maxAmount, globals.defaultNetwork.get(mapping.Network.maxAmount), networkConfigHelper)
+    minDiff = mars.element(mapping.Network.minDiff, globals.defaultNetwork.get(mapping.Network.minDiff), networkConfigHelper)
+    maxDiff = mars.element(mapping.Network.maxDiff, globals.defaultNetwork.get(mapping.Network.maxDiff), networkConfigHelper)
+    testNet = mars.element(mapping.Network.testNet, globals.defaultNetwork.get(mapping.Network.testNet),  networkConfigHelper)
 
 # Databases
 class databases:
@@ -82,7 +80,7 @@ class databases:
 class chainConfig:
     name = str(networkConfig.name.get())
     bootstrapIP = str(networkConfig.bootstrapIP.get())
-    magicNumber = str(networkConfig.magicNumber.get())
+    magicID = str(networkConfig.magicID.get())
     maxSupply = int(networkConfig.maxSupply.get())
     blockMaxReward = int(networkConfig.blockMaxReward.get())
     rewardName = str(networkConfig.rewardName.get())

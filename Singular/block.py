@@ -17,6 +17,7 @@
 from time import time as getTime
 from . import declarations
 from . import manager
+from . import mapping
 from . import transaction
 from . import formulae
 from . import helper
@@ -33,13 +34,13 @@ class Block:
         self.time = getTime()
         self.minerTime = None
         self.protocolVersion = declarations.core.protocolVersion
-        self.networkMagicNumber = declarations.chainConfig.magicNumber
+        self.networkMagicID = declarations.chainConfig.magicID
 
     def hashBlock(self):
         """
         Hashes the current block
         """
-        hashComposer = str("({}-{}-{}-{}-{}-{}-{})@{}-{}-{}".format(self.blockNumber,self.lastBlockHash,self.transactions,self.difficulty,self.nonce,self.time,self.minerTime,self.miner,self.protocolVersion,self.networkMagicNumber))
+        hashComposer = str("({}-{}-{}-{}-{}-{}-{})@{}-{}-{}".format(self.blockNumber, self.lastBlockHash, self.transactions, self.difficulty, self.nonce, self.time, self.minerTime, self.miner, self.protocolVersion, self.networkMagicID))
         blockHash = hashlib.sha256()
         blockHash.update(str(hashComposer).encode("utf-8"))
         return blockHash.hexdigest()
@@ -50,17 +51,17 @@ class Block:
         Returns the blocks list
         """
         return {
-            "blockNumber": self.blockNumber,
-            "lastBlockHash": self.lastBlockHash,
-            "transactions": self.transactions,
-            "difficulty": self.difficulty,
-            "nonce": self.nonce,
-            "miner": self.miner,
-            "time": self.time,
-            "minerTime": self.minerTime,
-            "hash": self.hashBlock(),
-            "protocolVersion": self.protocolVersion,
-            "networkMagicNumber": self.networkMagicNumber
+            mapping.Block.blockNumber: self.blockNumber,
+            mapping.Block.lastBlockHash: self.lastBlockHash,
+            mapping.Block.transactions: self.transactions,
+            mapping.Block.difficulty: self.difficulty,
+            mapping.Block.nonce: self.nonce,
+            mapping.Block.miner: self.miner,
+            mapping.Block.time: self.time,
+            mapping.Block.minerTime: self.minerTime,
+            mapping.Block.hash: self.hashBlock(),
+            mapping.Block.protocolVersion: self.protocolVersion,
+            mapping.Block.networkMagicID: self.networkMagicID
         }
 
 class utils:
@@ -72,7 +73,7 @@ class utils:
         # Verify the transactions
         for trans in transactions:
             # Define transaction object
-            transactionObject = transaction.Transaction(trans.get("sender"), trans.get("receiver"), trans.get("realAmount"), trans.get("signature"), trans.get("time"))
+            transactionObject = transaction.Transaction(trans.get(mapping.Transactions.sender), trans.get(mapping.Transactions.receiver), trans.get(mapping.Transactions.realAmount), trans.get(mapping.Transactions.signature), trans.get(mapping.Transactions.time))
             # Check transaction
             if not transactionObject.check(True):
                 # The block integrity was compromised!
@@ -93,12 +94,12 @@ class utils:
             reconstructor.lastBlockHash = str("0" * 64)
             for blockNumberSaved in range(manager.Manager.chainMan.getHeight()):
                 block = manager.Manager.chainMan.getChain(blockNumberSaved)
-                if block.get("blockNumber") == (blockNumber-1): reconstructor.lastBlockHash = block.get("hash")
+                if block.get(mapping.Block.blockNumber) == (blockNumber-1): reconstructor.lastBlockHash = block.get(mapping.Block.hash)
             # Stage 4 - Set difficulty
             lastBlockAmount = 0
             # Add the amount of the block to lastBlockAmount
             for trans in reconstructor.transactions:
-                lastBlockAmount += trans.get("realAmount")
+                lastBlockAmount += trans.get(mapping.Transactions.realAmount)
             # Calculate difficulty
             try: reconstructor.difficulty = formulae.Formulae.calculateDifficulty(reconstructor.lastBlockHash, (lastBlockAmount if lastBlockAmount != 0 else declarations.miningConfig.minDiff), formulae.Formulae.calculateReward(reconstructor.transactions, reconstructor.blockNumber))
             except (AttributeError, ZeroDivisionError, TypeError): reconstructor.difficulty = declarations.miningConfig.minDiff
@@ -128,15 +129,15 @@ class utils:
         blockData.transactions = transaction.utils.prepare(blockData.transactions)
         if type(manager.Manager.chainMan.getChain()) is dict and type(manager.Manager.chainMan.getHeight()) is int:
             # Stage 3 - Get the previous block hash and block number
-            blockData.lastBlockHash = manager.Manager.chainMan.getChain().get("hash")
+            blockData.lastBlockHash = manager.Manager.chainMan.getChain().get(mapping.Block.hash)
             blockData.blockNumber = int(manager.Manager.chainMan.getHeight())
             # Stage 4 - Set difficulty
             lastBlockAmount = 0
             # Add the amount of the block to lastBlockAmount
             for trans in blockData.transactions:
-                lastBlockAmount += trans.get("realAmount")
+                lastBlockAmount += trans.get(mapping.Transactions.realAmount)
             # Calculate difficulty
-            try: blockData.difficulty = formulae.Formulae.calculateDifficulty(manager.Manager.chainMan.getChain().get("hash"), (lastBlockAmount if lastBlockAmount != 0 else declarations.miningConfig.minDiff), formulae.Formulae.calculateReward())
+            try: blockData.difficulty = formulae.Formulae.calculateDifficulty(manager.Manager.chainMan.getChain().get(mapping.Block.hash), (lastBlockAmount if lastBlockAmount != 0 else declarations.miningConfig.minDiff), formulae.Formulae.calculateReward())
             except (AttributeError, ZeroDivisionError, TypeError): blockData.difficulty = declarations.miningConfig.minDiff
             # Checks If the blocks difficulty Is None type
             if type(blockData.difficulty) is None: blockData.difficulty = declarations.miningConfig.minDiff

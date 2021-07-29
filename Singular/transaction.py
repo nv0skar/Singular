@@ -17,6 +17,7 @@
 import time as getTime
 from . import declarations
 from . import manager
+from . import mapping
 from . import formulae
 from . import helper
 import base64
@@ -49,8 +50,8 @@ class Transaction:
                 if manager.Manager.chainMan.getHeight() != 0:
                     for blockMinedNumber in range(manager.Manager.chainMan.getHeight()):
                         blockMined = manager.Manager.chainMan.getChain(blockMinedNumber)
-                        for trans in blockMined.get("transactions"):
-                            if trans.get("signature") == self.signature:
+                        for trans in blockMined.get(mapping.Block.transactions):
+                            if trans.get(mapping.Transactions.signature) == self.signature:
                                 helper.report("Transaction verifier", "Repeated signature in the chain")
                                 return False
                 else:
@@ -92,7 +93,7 @@ class Transaction:
         if str(self.sender) == str(declarations.chainConfig.rewardName):
             # Check If there Is already a reward transaction in the memPool
             for trans in memPool:
-                if str(trans.get("sender")) == str(declarations.chainConfig.rewardName) and not fetched:
+                if str(trans.get(mapping.Transactions.sender)) == str(declarations.chainConfig.rewardName) and not fetched:
                     helper.report("Transaction checker", "There Is already a reward transaction in the memPool")
                     return False
             return True
@@ -109,7 +110,7 @@ class Transaction:
         if fetched is False:
             # Get memPool and check If the transaction Is duplicated
             for trans in memPool:
-                if str(trans.get("sender")) == self.sender and str(trans.get("receiver")) == self.receiver:
+                if str(trans.get(mapping.Transactions.sender)) == self.sender and str(trans.get(mapping.Transactions.receiver)) == self.receiver:
                     helper.report("Transaction checker", "The sender and receiver are the same")
                     return False
             # Declare senders balance
@@ -130,13 +131,13 @@ class Transaction:
 
     def get(self):
         return {
-            "sender": self.sender,
-            "receiver": self.receiver,
-            "amount": self.amount,
-            "realAmount": self.realAmount,
-            "commission": self.commission,
-            "time": self.time,
-            "signature": self.signature,
+            mapping.Transactions.sender: self.sender,
+            mapping.Transactions.receiver: self.receiver,
+            mapping.Transactions.amount: self.amount,
+            mapping.Transactions.realAmount: self.realAmount,
+            mapping.Transactions.commission: self.commission,
+            mapping.Transactions.time: self.time,
+            mapping.Transactions.signature: self.signature,
         }
 
 class utils:
@@ -157,14 +158,14 @@ class utils:
         # Check if the reward transaction of the last block is added if check is true
         if check and ((manager.Manager.chainMan.getHeight()) != 0):
             lastBlock = manager.Manager.chainMan.getChain()
-            lastBlockInfo = dict(miner=lastBlock.get("miner"), reward=formulae.Formulae.calculateReward(lastBlock.get("transactions"), lastBlock.get("blockNumber")))
+            lastBlockInfo = dict(miner=lastBlock.get(mapping.Block.miner), reward=formulae.Formulae.calculateReward(lastBlock.get(mapping.Block.transactions), lastBlock.get(mapping.Block.blockNumber)))
             rewardTransInMemPool = False
             for trans in transactionsMemPool:
-                if str(trans.get("receiver")) == str(lastBlockInfo.get("miner")): rewardTransInMemPool = True; break
+                if str(trans.get(mapping.Transactions.receiver)) == str(lastBlockInfo.get("miner")): rewardTransInMemPool = True; break
             if not rewardTransInMemPool: transactionsMemPool.append(utils.rewardTransactionComposer(str(lastBlockInfo.get("miner")), str(lastBlockInfo.get("reward"))))
         # For each transaction make some checks
         for trans in list(transactionsMemPool):
-            sender, receiver, amount, realAmount, commission, signature, time = trans.get("sender"), trans.get("receiver"), trans.get("amount"), trans.get("realAmount"), trans.get("commission"), trans.get("signature"), trans.get("time")
+            sender, receiver, amount, realAmount, commission, signature, time = trans.get(mapping.Transactions.sender), trans.get(mapping.Transactions.receiver), trans.get(mapping.Transactions.amount), trans.get(mapping.Transactions.realAmount), trans.get(mapping.Transactions.commission), trans.get(mapping.Transactions.signature), trans.get(mapping.Transactions.time)
             # Make transaction object
             transToVerify = Transaction(sender, receiver, realAmount, signature, time)
             # Verify transaction

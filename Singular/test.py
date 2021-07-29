@@ -18,6 +18,7 @@ import os
 import base64
 from . import declarations
 from . import manager
+from . import mapping
 from . import block
 from . import chain
 from . import transaction
@@ -61,8 +62,8 @@ class Test:
         declarations.helpers.printer.sprint("test", "Setting the chain and node temporal path")
         declarations.staticConfig.dataPath["chain"] = str(chainPathTmp)
         declarations.staticConfig.dataPath["nodes"] = str(nodesPathTmp)
-        # Delete the networkMagicNumber
-        declarations.chainConfig.magicNumber = "testMode"
+        # Delete the networkMagicID
+        declarations.chainConfig.magicID = "testMode"
         # Set the rewardName
         declarations.chainConfig.rewardName = "test"
         # Redeclare the databases objects to make the new path take effect
@@ -96,12 +97,12 @@ class Test:
         # Check if the transaction was added
         declarations.helpers.printer.sprint("test", "Checking if the transaction was added")
         lastBlockAdded = manager.Manager.chainMan.getChain()
-        madeTransactionLastBlockAdded = lastBlockAdded.get("transactions")[1]
-        if madeTransactionLastBlockAdded.get("sender") == str(addresses[0].get("encodedPubKey").decode()) and madeTransactionLastBlockAdded.get("receiver") == str(addresses[1].get("encodedPubKey").decode()):
+        madeTransactionLastBlockAdded = lastBlockAdded.get(mapping.Block.transactions)[1]
+        if madeTransactionLastBlockAdded.get(mapping.Transactions.sender) == str(addresses[0].get("encodedPubKey").decode()) and madeTransactionLastBlockAdded.get(mapping.Transactions.receiver) == str(addresses[1].get("encodedPubKey").decode()):
                     declarations.helpers.printer.sprint("test", "Transaction in the chain")
         else: declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Transaction weren't in the chain"); return
         # Check if the reward transactions were duplicated
-        if (lastBlockAdded.get("transactions")[0].get("sender") == str(declarations.chainConfig.rewardName)) and (lastBlockAdded.get("transactions")[1].get("sender") != str(declarations.chainConfig.rewardName)):
+        if (lastBlockAdded.get(mapping.Block.transactions)[0].get(mapping.Transactions.sender) == str(declarations.chainConfig.rewardName)) and (lastBlockAdded.get(mapping.Block.transactions)[1].get(mapping.Transactions.sender) != str(declarations.chainConfig.rewardName)):
             declarations.helpers.printer.sprint("test", "Reward transaction not duplicated")
         else: declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Reward transaction duplicated"); return
         declarations.helpers.printer.sprint("test", "Tests successfully passed!")

@@ -16,6 +16,7 @@
 
 import time
 from . import manager
+from . import mapping
 from . import miner
 from . import block as bl
 from . import formulae
@@ -41,7 +42,7 @@ class Chain:
             # The nonce was found
             # Check If the block Is already In the chain
             try:
-                if blockMined.get("blockNumber") == int(manager.Manager.chainMan.getChain().get("blockNumber")): return False, 0 # The block Is already In the chain!
+                if blockMined.get(mapping.Block.blockNumber) == int(manager.Manager.chainMan.getChain().get(mapping.Block.blockNumber)): return False, 0 # The block Is already In the chain!
             except (AttributeError, TypeError): pass
             # Now reward the miner!
             reward = formulae.Formulae.calculateReward()

@@ -16,6 +16,7 @@
 
 import multiprocessing
 from . import declarations
+from . import mapping
 from . import chain
 from . import block
 from . import transaction
@@ -65,14 +66,14 @@ class Manager:
                 # Check if the blockNumber of the block to add Is already taken by a block In the chain
                 for blockCheckNumber in range(Manager.chainMan.getHeight()):
                     blockCheck = Manager.chainMan.getChain(blockCheckNumber)
-                    if blockCheck.get("blockNumber") == blockToAdd.get("blockNumber"): return False
+                    if blockCheck.get(mapping.Block.blockNumber) == blockToAdd.get(mapping.Block.blockNumber): return False
                 # Verify the block
                 if verify:
-                    if block.utils.verify(blockToAdd.get("blockNumber"), blockToAdd.get("transactions"), blockToAdd.get("time"), blockToAdd.get("nonce"), blockToAdd.get("miner"), blockToAdd.get("minerTime"), blockToAdd.get("hash"), blockToAdd.get("protocolVersion")) is True:
+                    if block.utils.verify(blockToAdd.get(mapping.Block.blockNumber), blockToAdd.get(mapping.Block.transactions), blockToAdd.get(mapping.Block.time), blockToAdd.get(mapping.Block.nonce), blockToAdd.get(mapping.Block.miner), blockToAdd.get(mapping.Block.minerTime), blockToAdd.get(mapping.Block.hash), blockToAdd.get(mapping.Block.protocolVersion)) is True:
                         # Remove confirmed transactions from memPool
                         if clean: Manager.memPool.removeFromPool(clean=True)
                         # Add the reward to the memPool
-                        if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.utils.rewardTransactionComposer(blockToAdd.get("miner"), reward), True)
+                        if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.utils.rewardTransactionComposer(blockToAdd.get(mapping.Block.miner), reward), True)
                         # Mark a block as saved
                         declarations.status.mine.newBlockMined = True
                         # Save the block
@@ -83,7 +84,7 @@ class Manager:
                     # Remove confirmed transactions from memPool
                     if clean: Manager.memPool.removeFromPool(clean=True)
                     # Add the reward to the memPool
-                    if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.Transaction(declarations.chainConfig.rewardName, blockToAdd.get("miner"), reward, "Unnecessary!").get(), True)
+                    if addReward and not reward <= 0: Manager.memPool.addToPool(transaction.Transaction(declarations.chainConfig.rewardName, blockToAdd.get(mapping.Block.miner), reward, "Unnecessary!").get(), True)
                     # Mark a block as saved
                     declarations.status.mine.newBlockMined = True
                     # Save the block
@@ -215,7 +216,7 @@ class Manager:
             This function Is on top of the addToPool function in Storage.memPool
             """
             # Before adding, if the sender is the reward name check out if the amount is valid
-            if transactionToAdd.get("sender") == str(declarations.chainConfig.rewardName) or transactionToAdd.get("receiver") == str(declarations.chainConfig.rewardName):
+            if transactionToAdd.get(mapping.Transactions.sender) == str(declarations.chainConfig.rewardName) or transactionToAdd.get(mapping.Transactions.receiver) == str(declarations.chainConfig.rewardName):
                 if not bigBangAdd: return False
             try: declarations.databases.memPool.addToPool(transactionToAdd); return True
             except (declarations.helpers.baseExceptions): return False
@@ -243,10 +244,10 @@ class Manager:
             # Now calculate the balance
             for walletTransaction in transactions:
                 # If the wallet is the sender rest the amount of transaction and if it's the receiver sum the amount of transaction
-                if walletTransaction.get("sender") == wallet:
-                    balance -= walletTransaction.get("amount")
-                elif walletTransaction.get("receiver") == wallet:
-                    balance += walletTransaction.get("amount")
+                if walletTransaction.get(mapping.Transactions.sender) == wallet:
+                    balance -= walletTransaction.get(mapping.Transactions.amount)
+                elif walletTransaction.get(mapping.Transactions.receiver) == wallet:
+                    balance += walletTransaction.get(mapping.Transactions.amount)
             # Return balance
             return balance
 
@@ -260,8 +261,8 @@ class Manager:
             # Get all the transactions that the sender or the receiver is the wallet
             for blockNumber in range(Manager.chainMan.getHeight()):
                 blockCheck = Manager.chainMan.getChain(blockNumber)
-                for trans in blockCheck.get("transactions"):
-                    if (trans.get("sender") == wallet) or (trans.get("receiver") == wallet):
+                for trans in blockCheck.get(mapping.Block.transactions):
+                    if (trans.get(mapping.Transactions.sender) == wallet) or (trans.get(mapping.Transactions.receiver) == wallet):
                         transactions.append(trans)
             # Return all the transactions
             return transactions

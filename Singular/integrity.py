@@ -16,6 +16,7 @@
 
 from . import declarations
 from . import manager
+from . import mapping
 from . import exceptions
 
 class Integrity:
@@ -34,7 +35,7 @@ class Integrity:
         ## Check network configs
         networkNameStatus = declarations.networkConfig.name.get() != declarations.chainConfig.name
         networkBootstrapIPStatus = declarations.networkConfig.bootstrapIP.get() != declarations.chainConfig.bootstrapIP
-        networkMagicNumberStatus = declarations.networkConfig.magicNumber.get() != declarations.chainConfig.magicNumber
+        networkMagicIDStatus = declarations.networkConfig.magicID.get() != declarations.chainConfig.magicID
         networkMaxSupplyStatus = declarations.networkConfig.maxSupply.get() != declarations.chainConfig.maxSupply
         networkBlockMaxRewardStatus = declarations.networkConfig.blockMaxReward.get() != declarations.chainConfig.blockMaxReward
         networkRewardNameStatus = declarations.networkConfig.rewardName.get() != declarations.chainConfig.rewardName
@@ -43,7 +44,7 @@ class Integrity:
         networkMaxDiffStatus = declarations.networkConfig.maxDiff.get() != declarations.miningConfig.maxDiff
         networkTestNetStatus = declarations.networkConfig.testNet.get() != declarations.chainConfig.testNet
         # Check all the status
-        if dataPathStatus or minerAddressStatus or multiprocessingMiningStatus or networkNameStatus or networkBootstrapIPStatus or networkMagicNumberStatus or networkMaxSupplyStatus or networkBlockMaxRewardStatus or networkRewardNameStatus or networkMaxAmountStatus or networkMinDiffStatus or networkMaxDiffStatus or networkTestNetStatus:
+        if dataPathStatus or minerAddressStatus or multiprocessingMiningStatus or networkNameStatus or networkBootstrapIPStatus or networkMagicIDStatus or networkMaxSupplyStatus or networkBlockMaxRewardStatus or networkRewardNameStatus or networkMaxAmountStatus or networkMinDiffStatus or networkMaxDiffStatus or networkTestNetStatus:
             if not (networkMinDiffStatus or networkMaxDiffStatus and declarations.debugConfig.debug):
                     exceptions.Exceptions.Compromised("Inconsistent constant status", True)
         # Check the integrity of the settings
@@ -53,10 +54,10 @@ class Integrity:
         if declarations.chainConfig.maxAmount < declarations.chainConfig.blockMaxReward: exceptions.Exceptions.Compromised("Network's blockMaxReward Is higher than the maxAmount", True)
         # Get the last block for further checks
         lastBlock = manager.Manager.chainMan.getChain()
-        # Check If the last blockMagicNumber Is the same as networkMagicNumber
-        if lastBlock is not None and lastBlock.get("networkMagicNumber") != declarations.chainConfig.magicNumber: exceptions.Exceptions.Compromised("The last block saved hasn't got the same networkMagicNumber as the set", True)
+        # Check If the last blockMagicID Is the same as networkMagicID
+        if lastBlock is not None and lastBlock.get(mapping.Block.networkMagicID) != declarations.chainConfig.magicID: exceptions.Exceptions.Compromised("The last block saved hasn't got the same networkMagicID as the set", True)
         # Check that the rewardName in the database is the same as the established in the network config
         try:
-            if lastBlock.get("transactions")[0].get("sender") != declarations.chainConfig.rewardName: exceptions.Exceptions.Compromised("Network's rewardName It's different than the rewardName In the first transaction of the last block", True)
+            if lastBlock.get(mapping.Block.transactions)[0].get(mapping.Transactions.sender) != declarations.chainConfig.rewardName: exceptions.Exceptions.Compromised("Network's rewardName It's different than the rewardName In the first transaction of the last block", True)
         except (AttributeError, IndexError): pass
         return

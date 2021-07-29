@@ -17,6 +17,7 @@
 import threading
 from . import declarations
 from . import manager
+from . import mapping
 from . import block
 from flask import Flask
 from flask import request
@@ -55,7 +56,7 @@ class Endpoint:
             """
             Return info about the node
             """
-            return jsonify({"network": str(declarations.chainConfig.name), "networkMagicNumber": str(declarations.chainConfig.magicNumber), "protocolVersion": str(declarations.core.protocolVersion), "agent": str(declarations.core.agent)}), 200
+            return jsonify({"network": str(declarations.chainConfig.name), "networkMagicID": str(declarations.chainConfig.magicID), "protocolVersion": str(declarations.core.protocolVersion), "agent": str(declarations.core.agent)}), 200
 
         @staticmethod
         @endpoint.errorhandler(HTTPException)
@@ -91,16 +92,16 @@ class Endpoint:
             Add block to the chain
             """
             try:
-                blockToAdd = block.Block(list(request.json("transactions")))
-                blockToAdd.blockNumber = int(request.json("blockNumber"))
-                blockToAdd.difficulty = float(request.json("difficulty"))
-                blockToAdd.nonce = float(request.json("nonce"))
-                blockToAdd.miner = str(request.json("miner"))
-                blockToAdd.minerTime = float(request.json("minerTime"))
-                blockToAdd.lastBlockHash = str(request.json("lastBlockHash"))
-                blockToAdd.time = float(request.json("time"))
-                blockToAdd.networkMagicNumber = str(request.json("networkMagicNumber"))
-                blockToAdd.protocolVersion = str(request.json("protocolVersion"))
+                blockToAdd = block.Block(list(request.json(mapping.Block.transactions)))
+                blockToAdd.blockNumber = int(request.json(mapping.Block.blockNumber))
+                blockToAdd.difficulty = float(request.json(mapping.Block.difficulty))
+                blockToAdd.nonce = float(request.json(mapping.Block.nonce))
+                blockToAdd.miner = str(request.json(mapping.Block.miner))
+                blockToAdd.minerTime = float(request.json(mapping.Block.minerTime))
+                blockToAdd.lastBlockHash = str(request.json(mapping.Block.lastBlockHash))
+                blockToAdd.time = float(request.json(mapping.Block.time))
+                blockToAdd.networkMagicID = str(request.json(mapping.Block.networkMagicID))
+                blockToAdd.protocolVersion = str(request.json(mapping.Block.protocolVersion))
                 blockManagerResponse = manager.Manager.chainMan.addToChain(blockToAdd.get(), True, True, clean=True)
             except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
             if blockManagerResponse: return jsonify({"status": "success", "reason": "Apparently everything went fine ;)"}), 200
@@ -112,7 +113,7 @@ class Endpoint:
             """
             Add transaction to the memPool
             """
-            try: transactionManagerResponse = manager.Manager.wallet.transaction(request.json("sender"), request.json("receiver"), request.json("realAmount"), request.json("signature"), request.json("time"))
+            try: transactionManagerResponse = manager.Manager.wallet.transaction(request.json(mapping.Transactions.sender), request.json(mapping.Transactions.receiver), request.json(mapping.Transactions.realAmount), request.json(mapping.Transactions.signature), request.json(mapping.Transactions.time))
             except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
             if transactionManagerResponse: return jsonify({"status": "success", "reason": "Apparently everything went fine ;)"}), 200
             else: return jsonify({"status": "failed", "reason": "Transaction confirmation failed"}), 400
@@ -141,7 +142,7 @@ class Endpoint:
             """
             Issue transaction
             """
-            try: transactionManagerResponse = manager.Manager.wallet.transaction(request.json("sender"), request.json("receiver"), request.json("realAmount"), request.json("signature"), request.json("time"))
+            try: transactionManagerResponse = manager.Manager.wallet.transaction(request.json(mapping.Transactions.sender), request.json(mapping.Transactions.receiver), request.json(mapping.Transactions.realAmount), request.json(mapping.Transactions.signature), request.json(mapping.Transactions.time))
             except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "Invalid message format"}), 400
             if transactionManagerResponse: return jsonify({"status": "success", "reason": "Apparently everything went fine ;)"}), 200
             else: return jsonify({"status": "failed", "reason": "Transaction confirmation failed"}), 400

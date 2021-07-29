@@ -9,7 +9,7 @@ Get info about the node
 ```json
 {
   "network": "Here should be the network name of the node", 
-  "networkMagicNumber": "Here should be the magic number of the network", 	
+  "networkMagicID": "Here should be the magic number of the network",
   "protocolVersion": "Here should be the protocol version of the node", 
   "agent": "Here should be the info of the node"
 }
@@ -18,7 +18,7 @@ Get info about the node
 ```json
 { 
   "network": "mainSpace", 
-  "networkMagicNumber": "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib", 
+  "networkMagicID": "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib",
   "protocolVersion": "1",
   "agent": "SingularNode@v1"
 }

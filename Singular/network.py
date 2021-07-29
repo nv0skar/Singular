@@ -21,7 +21,7 @@ import nanoid
 class Network:
     class config:
         @staticmethod
-        def setup(netName, netBootstrapIP, netMagicNumber, netMaxSupply, netBlockMaxReward, netRewardName, netMaxAmount, netMinDiff, netMaxDiff, testNet):
+        def setup(netName, netBootstrapIP, netMagicID, netMaxSupply, netBlockMaxReward, netRewardName, netMaxAmount, netMinDiff, netMaxDiff, testNet):
             """
             Setup a new network
             """
@@ -36,8 +36,8 @@ class Network:
             if str(declarations.chainConfig.name) != str(netName) and netName is not None: declarations.networkConfig.name.set(str(netName))
             # Set networkBootstrapIP
             if str(declarations.chainConfig.bootstrapIP) != str(netBootstrapIP): declarations.networkConfig.bootstrapIP.set(str(netBootstrapIP))
-            # Set networkMagicNumber
-            if str(declarations.chainConfig.magicNumber) != str(netMagicNumber): declarations.networkConfig.magicNumber.set(str(netMagicNumber) if netMagicNumber != "{generate}" else str(nanoid.generate(size=36)))
+            # Set networkMagicID
+            if str(declarations.chainConfig.magicID) != str(netMagicID): declarations.networkConfig.magicID.set(str(netMagicID) if netMagicID != "{generate}" else str(nanoid.generate(size=36)))
             # Set networkMaxSupply
             if str(declarations.chainConfig.maxSupply) != str(netMaxSupply): declarations.networkConfig.maxSupply.set(float(netMaxSupply))
             # Set networkBlockMaxReward
@@ -63,4 +63,4 @@ class Network:
             # Run integrity check
             integrity.Integrity.check()
             # Return data
-            return dict(name=declarations.chainConfig.name, bootstrapIP=declarations.chainConfig.bootstrapIP, magicNumber=declarations.chainConfig.magicNumber, maxSupply=declarations.chainConfig.maxSupply, blockMaxReward=declarations.chainConfig.blockMaxReward, rewardName=declarations.chainConfig.rewardName, maxAmount=declarations.chainConfig.maxAmount, minDiff=declarations.miningConfig.minDiff, maxDiff=declarations.miningConfig.maxDiff, testNet=declarations.chainConfig.testNet)
+            return dict(name=declarations.chainConfig.name, bootstrapIP=declarations.chainConfig.bootstrapIP, magicID=declarations.chainConfig.magicID, maxSupply=declarations.chainConfig.maxSupply, blockMaxReward=declarations.chainConfig.blockMaxReward, rewardName=declarations.chainConfig.rewardName, maxAmount=declarations.chainConfig.maxAmount, minDiff=declarations.miningConfig.minDiff, maxDiff=declarations.miningConfig.maxDiff, testNet=declarations.chainConfig.testNet)

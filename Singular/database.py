@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from . import declarations
-from . import path
-from . import exceptions
-import rocksdb
-import numpy as np
 import ast
 from distutils.util import strtobool
+from . import declarations
+from . import mapping
+from . import path
+from . import exceptions
+import numpy as np
+import rocksdb
 
 class Database:
     class commons:
@@ -66,9 +67,9 @@ class Database:
             Add a new block
             """
             Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), "chain")
-            self.db.put(str(block.get("blockNumber")).encode(), str(block).encode())
-            if int(block.get("blockNumber")) == int(self.chainLength): self.__lastBlock = block
-            self.__lengthManager(1 if int(block.get("blockNumber")) == int(self.chainLength) else None)
+            self.db.put(str(block.get(mapping.Block.blockNumber)).encode(), str(block).encode())
+            if int(block.get(mapping.Block.blockNumber)) == int(self.chainLength): self.__lastBlock = block
+            self.__lengthManager(1 if int(block.get(mapping.Block.blockNumber)) == int(self.chainLength) else None)
             return True
 
         def remove(self, blockNumber):
@@ -128,7 +129,7 @@ class Database:
             """
             Add a new node
             """
-            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), str("nodes'"))
+            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), str("nodes"))
             self.db.put(str(self.nodesNumber).encode(), str(node).encode())
             self.__numberManager(1)
             return True
@@ -138,7 +139,7 @@ class Database:
             Remove a node
             When a node is removed the nodesNumber doesn't decrement.
             """
-            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), str("nodes'"))
+            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), str("nodes"))
             self.db.delete(str(nodeNumber).encode())
             self.__numberManager()
             return True
@@ -147,7 +148,7 @@ class Database:
             """
             Get nodes
             """
-            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), str("nodes'"))
+            Database.commons.debugChecker(self.db, self.__staticKeys.get("debugValueKey"), str("nodes"))
             nodes = np.array([ast.literal_eval(bytes(self.db.get(str(int(nodeNumber)).encode())).decode()) for nodeNumber in range(self.nodesNumber)], dict)
             return nodes
 

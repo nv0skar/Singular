@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from . import mapping
+
 __name__ = "SingularNode"
 __version__ = "0.0.1"
 __protocolVersion__ = 1
@@ -21,20 +23,19 @@ __url__ = "https://github.com/ItsTheGuy/Singular"
 
 # Default network constants
 defaultNetwork = {
-    "name": "mainSpace",
-    "bootstrapIP": "",
-    "magicNumber": "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib",
-    "maxSupply": 10000000000,
-    "blockMaxReward": 20,
-    "rewardName": "bigBang",
-    "maxAmount": 1000,
-    "minDiff": 4,
-    "maxDiff": 32,
-    "testNet": True
+    mapping.Network.name: "mainSpace",
+    mapping.Network.bootstrapIP: "",
+    mapping.Network.magicID: "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib",
+    mapping.Network.maxSupply: 10000000000,
+    mapping.Network.blockMaxReward: 20,
+    mapping.Network.rewardName: "bigBang",
+    mapping.Network.maxAmount: 1000,
+    mapping.Network.minDiff: 4,
+    mapping.Network.maxDiff: 32,
+    mapping.Network.testNet: True
 }
 
 # Default networking constants
-
 defaultNetworking = {
-    "port": 1004
+    mapping.Networking.port: 1004
 }

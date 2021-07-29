@@ -16,6 +16,7 @@
 
 from . import declarations
 from . import manager
+from . import mapping
 
 class Formulae:
     @staticmethod
@@ -40,13 +41,13 @@ class Formulae:
         commissionRewards = 0
         # For unconfirmed transaction was In the memPool get the commission and sum It to commissionRewards
         for trans in transactions:
-            if not trans.get("amount") <= 0:
-                if not trans.get("amount") == (trans.get("realAmount") - (trans.get("realAmount") / 100 * 0.01)):
+            if not trans.get(mapping.Transactions.amount) <= 0:
+                if not trans.get(mapping.Transactions.amount) == (trans.get(mapping.Transactions.realAmount) - (trans.get(mapping.Transactions.realAmount) / 100 * 0.01)):
                     # The transaction has an incorrect calculation of commission
-                    trans["commission"] = (trans.get("realAmount") / 100 * 0.01)
-                    trans["amount"] = (trans.get("realAmount") - (trans.get("realAmount") / 100 * 0.01))
+                    trans[mapping.Transactions.commission] = (trans.get(mapping.Transactions.realAmount) / 100 * 0.01)
+                    trans[mapping.Transactions.amount] = (trans.get(mapping.Transactions.realAmount) - (trans.get(mapping.Transactions.realAmount) / 100 * 0.01))
                 # Add commission to the commissionRewards
-                commissionRewards += trans["commission"]
+                commissionRewards += trans[mapping.Transactions.commission]
         return (bigBangReward + commissionRewards)
 
     @staticmethod
