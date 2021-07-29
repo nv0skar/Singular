@@ -14,13 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import multiprocessing
 from . import declarations
 from . import mapping
 from . import chain
 from . import block
 from . import transaction
-from . import p2p
 from . import storage
 from . import integrity
 from . import helper
@@ -151,23 +149,11 @@ class Manager:
             # Start the server
             endpoint.Endpoint.init()
             # TODO - Sync the chain, and not continue until there is no error
-            # Initialize
-            while True:
+            # Initialize mining
+            while bool(declarations.miningConfig.mining):
                 routine = Manager.protocol.go()
                 if routine is not False:
                     if graphical: frontend.Frontend.dialogs.blockMined(routine)
-
-        @staticmethod
-        def p2p():
-            """
-            Run p2p process
-            """
-            # Define process
-            p2pProcess = multiprocessing.Process(target=p2p.p2p.start)
-            # Set daemon as True to avoid the KeyboardInterrupt exception to not be handled
-            p2pProcess.daemon = True
-            # Run process
-            p2pProcess.start()
 
         @staticmethod
         def go():
@@ -178,9 +164,6 @@ class Manager:
             """
             # Check integrity
             integrity.Integrity.check()
-            # TODO - Fetch new blocks
-            # Check
-            # TODO - Fetch unconfirmed transactions
             # Get unconfirmed transactions
             unconfirmedTransacts = Manager.memPool.getFromPool()
             # Generate block

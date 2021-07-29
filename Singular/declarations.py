@@ -44,6 +44,7 @@ networkConfigHelper = mars.generate(str("{}/{}".format(os.path.dirname(__file__)
 class dynamicConfig:
     dataPath = mars.element(mapping.Commons.dataPath, dict(chain=str("{}/{}".format(os.path.dirname(__file__), files["chain"][1:] if files["chain"][0] == "/" else files["chain"])), nodes=str("{}/{}".format(os.path.dirname(__file__), files["nodes"][1:] if files["nodes"][0] == "/" else files["nodes"]))), configHelper)
     minerAddress = mars.element(mapping.Commons.minerAddress, "", configHelper)
+    mining = mars.element(mapping.Commons.mining, True, configHelper)
     multiprocessingMining = mars.element(mapping.Commons.multiprocessingMining, True, configHelper)
 
 class debugConfig:
@@ -89,6 +90,7 @@ class chainConfig:
 
 # Mining config
 class miningConfig:
+    mining = bool(dynamicConfig.mining.get())
     multiprocessingMining = bool(dynamicConfig.multiprocessingMining.get())
     minDiff = int(networkConfig.minDiff.get())
     maxDiff = int(networkConfig.maxDiff.get())

@@ -32,23 +32,29 @@ class Formulae:
         if forBlock is None: forBlock = manager.Manager.chainMan.getHeight()
         # Check if this Is the bigBang block
         if manager.Manager.chainMan.getHeight() == 0: return declarations.chainConfig.blockMaxReward
-        # Calculate bigBang reward
+        # Calculate mining reward
         blocksToMineMaxSupply = ((declarations.chainConfig.maxSupply * 2) / declarations.chainConfig.blockMaxReward)
         bigBangReward = (((blocksToMineMaxSupply - forBlock) / (blocksToMineMaxSupply)) * declarations.chainConfig.blockMaxReward) if not declarations.chainConfig.testNet else (blocksToMineMaxSupply * declarations.chainConfig.blockMaxReward)
-        # Check If the bigBang reward exceeds the maximum of 20 or Its equal or less than 0
+        # Check if the mining reward exceeds the maximum of 20 or its equal or less than 0
         if bigBangReward > declarations.chainConfig.blockMaxReward: bigBangReward = declarations.chainConfig.blockMaxReward
+        if bigBangReward < 0: bigBangReward = 0
+        # Check if the max supply is exceeded or going to be exceeded
+        if float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) * -1) >= declarations.chainConfig.maxSupply: bigBangReward = 0
+        if (generated := float(float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) - bigBangReward) * -1)) >= declarations.chainConfig.maxSupply:
+            if float(declarations.chainConfig.maxSupply) - float(generated) < 0: bigBangReward = 0
+            else: bigBangReward = float(declarations.chainConfig.maxSupply) - float(generated)
         # Get the commission rewards
         commissionRewards = 0
-        # For unconfirmed transaction was In the memPool get the commission and sum It to commissionRewards
+        # For unconfirmed transaction was in the memPool get the commission and sum It to commissionRewards
         for trans in transactions:
             if not trans.get(mapping.Transactions.amount) <= 0:
                 if not trans.get(mapping.Transactions.amount) == (trans.get(mapping.Transactions.realAmount) - (trans.get(mapping.Transactions.realAmount) / 100 * 0.01)):
-                    # The transaction has an incorrect calculation of commission
-                    trans[mapping.Transactions.commission] = (trans.get(mapping.Transactions.realAmount) / 100 * 0.01)
-                    trans[mapping.Transactions.amount] = (trans.get(mapping.Transactions.realAmount) - (trans.get(mapping.Transactions.realAmount) / 100 * 0.01))
-                # Add commission to the commissionRewards
-                commissionRewards += trans[mapping.Transactions.commission]
-        return (bigBangReward + commissionRewards)
+                    # Remove the invalid transaction from the memPool
+                    manager.Manager.memPool.removeFromPool(transactionToRemove=trans)
+                else: commissionRewards += trans[mapping.Transactions.commission]  # Add commission to the commissionRewards
+        # Calculate totalReward
+        totalReward = float(bigBangReward + commissionRewards)
+        return float(totalReward)
 
     @staticmethod
     def calculateDifficulty(lastHash, lastBlockAmount, blockReward):

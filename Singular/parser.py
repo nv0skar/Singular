@@ -34,6 +34,7 @@ class Arguments:
         arguments.add_argument("-m", "--minerAddress", help="Pass miner address", type=str, dest="address")
         arguments.add_argument("-s", "--show", help="Display the path of the databases and the network name before start", dest="show", action="store_true")
         arguments.add_argument("-sN", "--showNetwork", help="Get network raw info", dest="showNetwork", action="store_true")
+        arguments.add_argument("-tm", "--toggleMining", help=("Enable mining" if declarations.miningConfig.mining is False else "Disable mining"), action="store_true")
         arguments.add_argument("-tmP", "--toggleMultiprocessingMining", help=("Enable multiprocessing mining" if declarations.miningConfig.multiprocessingMining is False else "Disable multiprocessing mining"), action="store_true")
         arguments.add_argument("--pathChain", help="Change the default path to save the chain (Add {path} to get the Singular path)", type=str, dest="chainPath")
         arguments.add_argument("--pathNodes", help="Change the default path to save the nodes (Add {path} to get the Singular path)", type=str, dest="nodesPath")
@@ -46,7 +47,7 @@ class Arguments:
         # Perform the tasks of the arguments
         Arguments.update(argsReturns)
         # Check if has to exit after the arguments passed
-        argsToExit = argsReturns.networkSetup or argsReturns.address or argsReturns.chainPath or argsReturns.nodesPath or argsReturns.toggleMultiprocessingMining or argsReturns.clear or argsReturns.test or argsReturns.quit
+        argsToExit = argsReturns.networkSetup or argsReturns.address or argsReturns.chainPath or argsReturns.nodesPath or argsReturns.toggleMining or argsReturns.toggleMultiprocessingMining or argsReturns.clear or argsReturns.test or argsReturns.quit
         if argsToExit:
             # If the show argument was passed, show the paths before exiting
             if argsReturns.show: print("\nChain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
@@ -92,7 +93,11 @@ class Arguments:
             # Save newDataPath
             try: declarations.dynamicConfig.dataPath.set(dict(newDataPath))
             except declarations.helpers.updateExceptions as error: print("Unable to set nodes path. Error: {}".format(error))
-        # Check If toggleMultiprocessingMining was passed
+        # Check if toggleMining was passed
+        if argsReturns.toggleMining:
+            try: declarations.dynamicConfig.mining.set(True if declarations.miningConfig.mining is False else False)
+            except declarations.helpers.updateExceptions as error: print("Unable to toggle mining. Error: {}".format(error))
+        # Check if toggleMultiprocessingMining was passed
         if argsReturns.toggleMultiprocessingMining:
             try: declarations.dynamicConfig.multiprocessingMining.set(True if declarations.miningConfig.multiprocessingMining is False else False)
             except declarations.helpers.updateExceptions as error: print("Unable to toggle multiprocessing mining. Error: {}".format(error))

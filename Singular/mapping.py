@@ -17,6 +17,7 @@
 class Commons:
     dataPath = "dataPath"
     minerAddress = "minerAddress"
+    mining = "mining"
     multiprocessingMining = "multiprocessingMining"
 
 class Block:

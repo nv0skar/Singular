@@ -114,8 +114,13 @@ class utils:
         reconstructor.minerTime = minerTime
         # Stage 6 - Set the nonce
         reconstructor.nonce = nonce
-        # Compare the block hash of the reconstructor with the expected hash
-        if reconstructor.hashBlock() == expectedHash: return True # The block integrity Is correct
+        # Compare the block hash of the reconstructor with the expected hash and check if we add the reward to the chain the max supply will exceed
+        rewardAmount = 0
+        for trans in reconstructor.transactions:
+            if trans.get(mapping.Transactions.sender) == declarations.chainConfig.rewardName or trans.get(mapping.Transactions.receiver) == declarations.chainConfig.rewardName:
+                rewardAmount = trans.get(mapping.Transactions.amount)
+                break
+        if reconstructor.hashBlock() == expectedHash and (float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) * -1) + rewardAmount) <= declarations.chainConfig.maxSupply: return True # The block integrity Is correct
         else: return False # The block integrity was compromised!
 
     @staticmethod
