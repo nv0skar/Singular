@@ -144,7 +144,8 @@ class Manager:
             integrity.Integrity.check()
             # Get the height of the chain, and check if there are any blocks. If doesn't, ask to start a new chain
             try:
-                if (int(Manager.chainMan.getHeight()) == 0) and (not bool(frontend.Frontend.dialogs.startChain())): exit()
+                if (int(Manager.chainMan.getHeight()) == 0) and declarations.miningConfig.mining:
+                    if not bool(frontend.Frontend.dialogs.startChain()): exit()
             except (declarations.helpers.baseExceptions): declarations.helpers.printer.sprint("main", "There was an error while checking the the chain height. Chain height check was performed to ask if should start a new chain.")
             # Start the server
             endpoint.Endpoint.init()
