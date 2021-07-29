@@ -82,10 +82,10 @@ class chainConfig:
     name = str(networkConfig.name.get())
     bootstrapIP = str(networkConfig.bootstrapIP.get())
     magicID = str(networkConfig.magicID.get())
-    maxSupply = int(networkConfig.maxSupply.get())
-    blockMaxReward = int(networkConfig.blockMaxReward.get())
+    maxSupply = float(networkConfig.maxSupply.get())
+    blockMaxReward = float(networkConfig.blockMaxReward.get())
     rewardName = str(networkConfig.rewardName.get())
-    maxAmount = int(networkConfig.maxAmount.get())
+    maxAmount = float(networkConfig.maxAmount.get())
     testNet = bool(networkConfig.testNet.get())
 
 # Mining config

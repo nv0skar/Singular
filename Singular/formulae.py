@@ -24,26 +24,28 @@ class Formulae:
         """
         Calculate the reward of the miner.
         To calculate the reward the following algorithm Is used:
-        Reward = (((((BlockMaxSupply*2) / BlockMaxReward) - BlocksMined / ((BlockMaxSupply*2) / BlockMaxReward)) * BlockMaxReward) + commissionRewards
+        Reward = ((((((BlockMaxSupply*2) / BlockMaxReward) - 2) - BlocksMined / (((BlockMaxSupply*2) / BlockMaxReward) - 2)) * BlockMaxReward) + commissionRewards
         (This assumes that the transaction object itself or prepareTransactions() already subtracted 0.01%)
         """
         # Get the transactions or forBlock if one of those are None
         if transactions is None: transactions = manager.Manager.memPool.getFromPool()
         if forBlock is None: forBlock = manager.Manager.chainMan.getHeight()
-        # Check if this Is the bigBang block
+        # Check if this is the first block
         if manager.Manager.chainMan.getHeight() == 0: return declarations.chainConfig.blockMaxReward
         # Calculate mining reward
-        blocksToMineMaxSupply = ((declarations.chainConfig.maxSupply * 2) / declarations.chainConfig.blockMaxReward)
-        bigBangReward = (((blocksToMineMaxSupply - forBlock) / (blocksToMineMaxSupply)) * declarations.chainConfig.blockMaxReward) if not declarations.chainConfig.testNet else (blocksToMineMaxSupply * declarations.chainConfig.blockMaxReward)
+        blocksToMineMaxSupply = int(((declarations.chainConfig.maxSupply * 2) / declarations.chainConfig.blockMaxReward) - 2)
+        miningReward = float(((blocksToMineMaxSupply - forBlock) / (blocksToMineMaxSupply)) * declarations.chainConfig.blockMaxReward) if not declarations.chainConfig.testNet else float(blocksToMineMaxSupply * declarations.chainConfig.blockMaxReward)
         # Check if the mining reward exceeds the maximum of 20 or its equal or less than 0
-        if bigBangReward > declarations.chainConfig.blockMaxReward: bigBangReward = declarations.chainConfig.blockMaxReward
-        if bigBangReward < 0: bigBangReward = 0
+        if miningReward > declarations.chainConfig.blockMaxReward: miningReward = declarations.chainConfig.blockMaxReward
+        if miningReward < 0: miningReward = 0
+        # Get the total generated balance
+        generatedBalance = float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) * -1)
         # Check if the max supply is exceeded or going to be exceeded
-        if float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) * -1) >= declarations.chainConfig.maxSupply: bigBangReward = 0
-        if (generated := float(float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) - bigBangReward) * -1)) >= declarations.chainConfig.maxSupply:
-            if float(declarations.chainConfig.maxSupply) - float(generated) < 0: bigBangReward = 0
-            else: bigBangReward = float(declarations.chainConfig.maxSupply) - float(generated)
-        # Get the commission rewards
+        if generatedBalance >= declarations.chainConfig.maxSupply: miningReward = 0
+        if float(((generatedBalance * -1) - miningReward) * -1) >= declarations.chainConfig.maxSupply:
+            if float(declarations.chainConfig.maxSupply) - float(generatedBalance) < 0: miningReward = 0
+            else: miningReward = float(declarations.chainConfig.maxSupply) - float(generatedBalance)
+        # Define the commission rewards
         commissionRewards = 0
         # For unconfirmed transaction was in the memPool get the commission and sum It to commissionRewards
         for trans in transactions:
@@ -53,7 +55,7 @@ class Formulae:
                     manager.Manager.memPool.removeFromPool(transactionToRemove=trans)
                 else: commissionRewards += trans[mapping.Transactions.commission]  # Add commission to the commissionRewards
         # Calculate totalReward
-        totalReward = float(bigBangReward + commissionRewards)
+        totalReward = float(miningReward + commissionRewards)
         return float(totalReward)
 
     @staticmethod

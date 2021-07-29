@@ -29,6 +29,8 @@ class Network:
             try:
                 if not (type(netName) is str and (type(netBootstrapIP) is str or type(netBootstrapIP) is None) and type(float(netMaxSupply)) is float and type(float(netBlockMaxReward)) is float and type(float(netMaxAmount)) is float and type(int(netMinDiff)) is int and type(int(netMaxDiff)) is int and type(bool(testNet)) is bool and int(netMinDiff) > 0 and int(netMaxDiff) < 33):
                     return str("The types of some value weren't valid")
+                if netMaxSupply == netBlockMaxReward:
+                    return str("The max supply and the max reward cannot be the same")
             except GeneratorExit: return str("The types of some value weren't valid")
             if float(netMaxAmount) < float(netBlockMaxReward): return str("blockMaxReward Is higher than the maxAmount")
             # Set the values

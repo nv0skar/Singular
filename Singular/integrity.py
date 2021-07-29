@@ -52,6 +52,7 @@ class Integrity:
         if declarations.miningConfig.minDiff < 1 or declarations.miningConfig.minDiff > 32: exceptions.Exceptions.Compromised("Network's minDiff Is too low or too high", True)
         if declarations.miningConfig.maxDiff < 1 or declarations.miningConfig.maxDiff > 32: exceptions.Exceptions.Compromised("Network's maxDiff Is too low or too high", True)
         if declarations.chainConfig.maxAmount < declarations.chainConfig.blockMaxReward: exceptions.Exceptions.Compromised("Network's blockMaxReward Is higher than the maxAmount", True)
+        if declarations.chainConfig.maxSupply == declarations.chainConfig.blockMaxReward: exceptions.Exceptions.Compromised("Network's max supply and max reward are the same", True)
         # Get the last block for further checks
         lastBlock = manager.Manager.chainMan.getChain()
         # Check If the last blockMagicID Is the same as networkMagicID
