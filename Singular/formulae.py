@@ -24,7 +24,7 @@ class Formulae:
         """
         Calculate the reward of the miner.
         To calculate the reward the following algorithm Is used:
-        Reward = ((((((BlockMaxSupply*2) / BlockMaxReward) - 2) - BlocksMined / (((BlockMaxSupply*2) / BlockMaxReward) - 2)) * BlockMaxReward) + commissionRewards
+        Reward = ((((((BlockMaxSupply*2) / BlockMaxReward) - 2) - BlocksMined) / (((BlockMaxSupply*2) / BlockMaxReward) - 2)) * BlockMaxReward) + commissionRewards
         (This assumes that the transaction object itself or prepareTransactions() already subtracted 0.01%)
         """
         # Get the transactions or forBlock if one of those are None
