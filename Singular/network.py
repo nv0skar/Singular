@@ -21,15 +21,17 @@ import nanoid
 class Network:
     class config:
         @staticmethod
-        def setup(netName, netBootstrapIP, netMagicID, netMaxSupply, netBlockMaxReward, netRewardName, netMaxAmount, netMinDiff, netMaxDiff, testNet):
+        def setup(netName, netBootstrapIP, netMagicID, netMaxSupply, netMaxAmount, netBlockMaxReward, netRewardName, netMinDiff, netMaxDiff, testNet):
             """
             Setup a new network
             """
             # Check If the values are valid
             try:
-                if not (type(netName) is str and (type(netBootstrapIP) is str or type(netBootstrapIP) is None) and type(float(netMaxSupply)) is float and type(float(netBlockMaxReward)) is float and type(float(netMaxAmount)) is float and type(int(netMinDiff)) is int and type(int(netMaxDiff)) is int and type(bool(testNet)) is bool and int(netMinDiff) > 0 and int(netMaxDiff) < 33):
+                if not (((type(netName) is str) and ((type(netBootstrapIP) is str) or (type(netBootstrapIP) is None)) and (type(float(netMaxSupply)) is float) and (type(float(netMaxAmount)) is float) and (type(float(netBlockMaxReward)) is float) and (type(int(netMinDiff)) is int) and (type(int(netMaxDiff)) is int) and (type(bool(testNet)) is bool) and (int(netMinDiff) > 0 and int(netMaxDiff) < 33))):
                     return str("The types of some value weren't valid")
-                if netMaxSupply == netBlockMaxReward:
+                if float(netMaxAmount) > float(netMaxSupply):
+                    return str("The max amount cannot be higher than the max supply")
+                if float(netMaxSupply) == float(netBlockMaxReward):
                     return str("The max supply and the max reward cannot be the same")
             except GeneratorExit: return str("The types of some value weren't valid")
             if float(netMaxAmount) < float(netBlockMaxReward): return str("blockMaxReward Is higher than the maxAmount")
@@ -42,13 +44,13 @@ class Network:
             if str(declarations.chainConfig.magicID) != str(netMagicID): declarations.networkConfig.magicID.set(str(netMagicID) if netMagicID != "{generate}" else str(nanoid.generate(size=36)))
             # Set networkMaxSupply
             if str(declarations.chainConfig.maxSupply) != str(netMaxSupply): declarations.networkConfig.maxSupply.set(float(netMaxSupply))
+            # Set networkMaxAmount
+            if str(declarations.chainConfig.maxAmount) != str(netMaxAmount): declarations.networkConfig.maxAmount.set(float(netMaxAmount))
             # Set networkBlockMaxReward
             if str(declarations.chainConfig.blockMaxReward) != str(netBlockMaxReward): declarations.networkConfig.blockMaxReward.set(float(netBlockMaxReward))
             # Set networkRewardName
             if str(declarations.chainConfig.rewardName) != str(netRewardName): declarations.networkConfig.rewardName.set(str(netRewardName))
-            # Set networkMaxAmount
-            if str(declarations.chainConfig.maxAmount) != str(netMaxAmount): declarations.networkConfig.maxAmount.set(float(netMaxAmount))
-            # Set networkMinDiff
+           # Set networkMinDiff
             if str(declarations.miningConfig.minDiff) != str(netMinDiff): declarations.networkConfig.minDiff.set(int(netMinDiff))
             # Set networkMaxDiff
             if str(declarations.miningConfig.maxDiff) != str(netMaxDiff): declarations.networkConfig.maxDiff.set(int(netMaxDiff))
@@ -65,4 +67,4 @@ class Network:
             # Run integrity check
             integrity.Integrity.check()
             # Return data
-            return dict(name=declarations.chainConfig.name, bootstrapIP=declarations.chainConfig.bootstrapIP, magicID=declarations.chainConfig.magicID, maxSupply=declarations.chainConfig.maxSupply, blockMaxReward=declarations.chainConfig.blockMaxReward, rewardName=declarations.chainConfig.rewardName, maxAmount=declarations.chainConfig.maxAmount, minDiff=declarations.miningConfig.minDiff, maxDiff=declarations.miningConfig.maxDiff, testNet=declarations.chainConfig.testNet)
+            return dict(name=declarations.chainConfig.name, bootstrapIP=declarations.chainConfig.bootstrapIP, magicID=declarations.chainConfig.magicID, maxSupply=declarations.chainConfig.maxSupply, maxAmount=declarations.chainConfig.maxAmount, blockMaxReward=declarations.chainConfig.blockMaxReward, rewardName=declarations.chainConfig.rewardName, minDiff=declarations.miningConfig.minDiff, maxDiff=declarations.miningConfig.maxDiff, testNet=declarations.chainConfig.testNet)

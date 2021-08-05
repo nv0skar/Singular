@@ -62,9 +62,9 @@ class networkConfig:
     bootstrapIP = mars.element(mapping.Network.bootstrapIP, globals.defaultNetwork.get(mapping.Network.bootstrapIP), networkConfigHelper)
     magicID = mars.element(mapping.Network.magicID, globals.defaultNetwork.get(mapping.Network.magicID), networkConfigHelper)
     maxSupply = mars.element(mapping.Network.maxSupply, globals.defaultNetwork.get(mapping.Network.maxSupply), networkConfigHelper)
+    maxAmount = mars.element(mapping.Network.maxAmount, globals.defaultNetwork.get(mapping.Network.maxAmount), networkConfigHelper)
     blockMaxReward = mars.element(mapping.Network.blockMaxReward, globals.defaultNetwork.get(mapping.Network.blockMaxReward), networkConfigHelper)
     rewardName = mars.element(mapping.Network.rewardName, globals.defaultNetwork.get(mapping.Network.rewardName), networkConfigHelper)
-    maxAmount = mars.element(mapping.Network.maxAmount, globals.defaultNetwork.get(mapping.Network.maxAmount), networkConfigHelper)
     minDiff = mars.element(mapping.Network.minDiff, globals.defaultNetwork.get(mapping.Network.minDiff), networkConfigHelper)
     maxDiff = mars.element(mapping.Network.maxDiff, globals.defaultNetwork.get(mapping.Network.maxDiff), networkConfigHelper)
     testNet = mars.element(mapping.Network.testNet, globals.defaultNetwork.get(mapping.Network.testNet),  networkConfigHelper)
@@ -83,9 +83,9 @@ class chainConfig:
     bootstrapIP = str(networkConfig.bootstrapIP.get())
     magicID = str(networkConfig.magicID.get())
     maxSupply = float(networkConfig.maxSupply.get())
+    maxAmount = float(networkConfig.maxAmount.get())
     blockMaxReward = float(networkConfig.blockMaxReward.get())
     rewardName = str(networkConfig.rewardName.get())
-    maxAmount = float(networkConfig.maxAmount.get())
     testNet = bool(networkConfig.testNet.get())
 
 # Mining config
@@ -98,8 +98,8 @@ class miningConfig:
 # Helpers
 class helpers:
     printer, messageLevelTypes = superPrinter.printer(), superPrinter.levels
-    baseExceptions = (AttributeError, TypeError, ValueError)
-    updateExceptions = (AttributeError, TypeError, ValueError, PermissionError, FileNotFoundError)
+    baseExceptions = (AttributeError, TypeError, ValueError, ZeroDivisionError)
+    updateExceptions = (AttributeError, TypeError, ValueError, ZeroDivisionError, PermissionError, FileNotFoundError)
 
 # Status
 class status:

@@ -64,12 +64,12 @@ class Frontend:
                 netMagicID = Prompt.ask("Network's magic ID (Leave empty to use the default one, put {generate} to generate a new one)", default=str(declarations.chainConfig.magicID))
                 # Ask for maxSupply
                 netMaxSupply = Prompt.ask("Network's max supply", default=str(declarations.chainConfig.maxSupply))
+                 # Ask for maxAmount
+                netMaxAmount = Prompt.ask("Network's max amount (The maximum amount that 1 transaction could send per time)", default=str(declarations.chainConfig.maxAmount))
                 # Ask for blockMaxReward
                 netBlockMaxReward = Prompt.ask("Network's block max reward", default=str(declarations.chainConfig.blockMaxReward))
                 # Ask for rewardName
                 netRewardName = Prompt.ask("Network's reward name", default=str(declarations.chainConfig.rewardName))
-                # Ask for maxAmount
-                netMaxAmount = Prompt.ask("Network's max amount (The maximum amount that 1 transaction could send per time)", default=str(declarations.chainConfig.maxAmount))
                 # Ask for minDiff
                 netMinDiff = Prompt.ask("Network's minimum difficulty", default=str(declarations.miningConfig.minDiff))
                 # Ask for maxDiff
@@ -94,17 +94,17 @@ class Frontend:
                 if bool(rawNetConf.get(mapping.Network.magicID)): netMagicID = str(rawNetConf.get(mapping.Network.magicID))
                 else: netMagicID = declarations.chainConfig.magicID
                 # Get the maxSupply
-                if bool(rawNetConf.get(mapping.Network.maxSupply)): netMaxSupply = str(rawNetConf.get(mapping.Network.maxSupply))
+                if bool(rawNetConf.get(mapping.Network.maxSupply)): netMaxSupply = float(rawNetConf.get(mapping.Network.maxSupply))
                 else: netMaxSupply = declarations.chainConfig.maxSupply
+                # Get the maxAmount
+                if bool(rawNetConf.get(mapping.Network.maxAmount)): netMaxAmount = float(rawNetConf.get(mapping.Network.maxAmount))
+                else: netMaxAmount = declarations.chainConfig.maxAmount
                 # Get the blockMaxReward
-                if bool(rawNetConf.get(mapping.Network.blockMaxReward)): netBlockMaxReward = str(rawNetConf.get(mapping.Network.blockMaxReward))
+                if bool(rawNetConf.get(mapping.Network.blockMaxReward)): netBlockMaxReward = float(rawNetConf.get(mapping.Network.blockMaxReward))
                 else: netBlockMaxReward = declarations.chainConfig.blockMaxReward
                 # Get the rewardName
                 if bool(rawNetConf.get(mapping.Network.rewardName)): netRewardName = str(rawNetConf.get(mapping.Network.rewardName))
                 else: netRewardName = declarations.chainConfig.rewardName
-                # Get the maxAmount
-                if bool(rawNetConf.get(mapping.Network.maxAmount)): netMaxAmount = str(rawNetConf.get(mapping.Network.maxAmount))
-                else: netMaxAmount = declarations.chainConfig.maxAmount
                 # Get the minDiff
                 if bool(rawNetConf.get(mapping.Network.minDiff)): netMinDiff = str(rawNetConf.get(mapping.Network.minDiff))
                 else: netMinDiff = declarations.miningConfig.minDiff
@@ -115,7 +115,7 @@ class Frontend:
                 if bool(rawNetConf.get(mapping.Network.minDiff)): netTestNet = bool(rawNetConf.get(mapping.Network.testNet))
                 else: netTestNet = declarations.chainConfig.testNet
             # Execute setup
-            setupSuccess = network.Network.config.setup(netName, netBootstrapIP, netMagicID, netMaxSupply, netBlockMaxReward, netRewardName, netMaxAmount, netMinDiff, netMaxDiff, netTestNet)
+            setupSuccess = network.Network.config.setup(netName, netBootstrapIP, netMagicID, netMaxSupply, netMaxAmount, netBlockMaxReward, netRewardName, netMinDiff, netMaxDiff, netTestNet)
             if not type(setupSuccess) is str: Console().print("Network setup agent completed successfully", style=Style(color="green"))
             else: Console().print("Network setup agent failed: {}".format(setupSuccess), style=Style(color="red", bold=True))
 

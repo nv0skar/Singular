@@ -24,7 +24,7 @@ class Formulae:
         """
         Calculate the reward of the miner.
         To calculate the reward the following algorithm Is used:
-        Reward = ((((((BlockMaxSupply*2) / BlockMaxReward) - 2) - BlocksMined) / (((BlockMaxSupply*2) / BlockMaxReward) - 2)) * BlockMaxReward) + commissionRewards
+        Reward = (((((BlockMaxSupply*(2*BlockMaxReward)) / BlockMaxReward) - BlocksMined) / ((BlockMaxSupply*(2*BlockMaxReward)) / BlockMaxReward)) * BlockMaxReward) + commissionRewards
         (This assumes that the transaction object itself or prepareTransactions() already subtracted 0.01%)
         """
         # Get the transactions or forBlock if one of those are None
@@ -32,19 +32,20 @@ class Formulae:
         if forBlock is None: forBlock = manager.Manager.chainMan.getHeight()
         # Check if this is the first block
         if manager.Manager.chainMan.getHeight() == 0: return declarations.chainConfig.blockMaxReward
-        # Calculate mining reward
-        blocksToMineMaxSupply = int(((declarations.chainConfig.maxSupply * 2) / declarations.chainConfig.blockMaxReward) - 2)
-        miningReward = float(((blocksToMineMaxSupply - forBlock) / (blocksToMineMaxSupply)) * declarations.chainConfig.blockMaxReward) if not declarations.chainConfig.testNet else float(blocksToMineMaxSupply * declarations.chainConfig.blockMaxReward)
-        # Check if the mining reward exceeds the maximum of 20 or its equal or less than 0
-        if miningReward > declarations.chainConfig.blockMaxReward: miningReward = declarations.chainConfig.blockMaxReward
-        if miningReward < 0: miningReward = 0
+        # Calculate blocks to mine to achieve the max supply
+        blocksToMineMaxSupply = int((declarations.chainConfig.maxSupply * (2*declarations.chainConfig.blockMaxReward)) / declarations.chainConfig.blockMaxReward)
+        # Calculate the mining reward
+        if not int(forBlock) > int(blocksToMineMaxSupply):
+            miningReward = float(((blocksToMineMaxSupply - forBlock) / (blocksToMineMaxSupply)) * declarations.chainConfig.blockMaxReward) if not declarations.chainConfig.testNet else float(blocksToMineMaxSupply * declarations.chainConfig.blockMaxReward)
+            # Check if the mining reward exceeds the max reward or the reward its equal or less than 0
+            if (miningReward > declarations.chainConfig.blockMaxReward) or (miningReward) <= 0: miningReward = 0
+        else: miningReward = 0
         # Get the total generated balance
         generatedBalance = float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) * -1)
         # Check if the max supply is exceeded or going to be exceeded
-        if generatedBalance >= declarations.chainConfig.maxSupply: miningReward = 0
-        if float(((generatedBalance * -1) - miningReward) * -1) >= declarations.chainConfig.maxSupply:
-            if float(declarations.chainConfig.maxSupply) - float(generatedBalance) < 0: miningReward = 0
-            else: miningReward = float(declarations.chainConfig.maxSupply) - float(generatedBalance)
+        if float(generatedBalance) > float(declarations.chainConfig.maxSupply): miningReward = 0
+        if float(((generatedBalance) + miningReward)) > float(declarations.chainConfig.maxSupply):
+            miningReward = float(declarations.chainConfig.maxSupply) - float(generatedBalance)
         # Define the commission rewards
         commissionRewards = 0
         # For unconfirmed transaction was in the memPool get the commission and sum It to commissionRewards

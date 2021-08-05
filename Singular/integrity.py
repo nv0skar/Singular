@@ -37,14 +37,14 @@ class Integrity:
         networkBootstrapIPStatus = declarations.networkConfig.bootstrapIP.get() != declarations.chainConfig.bootstrapIP
         networkMagicIDStatus = declarations.networkConfig.magicID.get() != declarations.chainConfig.magicID
         networkMaxSupplyStatus = declarations.networkConfig.maxSupply.get() != declarations.chainConfig.maxSupply
+        networkMaxAmountStatus = declarations.networkConfig.maxAmount.get() != declarations.chainConfig.maxAmount
         networkBlockMaxRewardStatus = declarations.networkConfig.blockMaxReward.get() != declarations.chainConfig.blockMaxReward
         networkRewardNameStatus = declarations.networkConfig.rewardName.get() != declarations.chainConfig.rewardName
-        networkMaxAmountStatus = declarations.networkConfig.maxAmount.get() != declarations.chainConfig.maxAmount
         networkMinDiffStatus = declarations.networkConfig.minDiff.get() != declarations.miningConfig.minDiff
         networkMaxDiffStatus = declarations.networkConfig.maxDiff.get() != declarations.miningConfig.maxDiff
         networkTestNetStatus = declarations.networkConfig.testNet.get() != declarations.chainConfig.testNet
         # Check all the status
-        if dataPathStatus or minerAddressStatus or multiprocessingMiningStatus or networkNameStatus or networkBootstrapIPStatus or networkMagicIDStatus or networkMaxSupplyStatus or networkBlockMaxRewardStatus or networkRewardNameStatus or networkMaxAmountStatus or networkMinDiffStatus or networkMaxDiffStatus or networkTestNetStatus:
+        if dataPathStatus or minerAddressStatus or multiprocessingMiningStatus or networkNameStatus or networkBootstrapIPStatus or networkMagicIDStatus or networkMaxSupplyStatus or networkMaxAmountStatus or networkBlockMaxRewardStatus or networkRewardNameStatus or networkMinDiffStatus or networkMaxDiffStatus or networkTestNetStatus:
             if not (networkMinDiffStatus or networkMaxDiffStatus and declarations.debugConfig.debug):
                     exceptions.Exceptions.Compromised("Inconsistent constant status", True)
         # Check the integrity of the settings

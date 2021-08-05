@@ -69,12 +69,12 @@ class Arguments:
         if argsReturns.networkSetup:
             # Initialize network setup agent
             try: frontend.Frontend.setup.network()
-            except declarations.helpers.updateExceptions as error: print("Unable to update network settings because of the file's permissions. Error: {}".format(error))
+            except declarations.helpers.updateExceptions as error: print("Unable to update network settings. Error: {}".format(error))
         # Check if the minerAddress argument was passed
         if argsReturns.address:
             # Set the minerAddress
             try: declarations.dynamicConfig.minerAddress.set(str(argsReturns.address))
-            except declarations.helpers.updateExceptions as error: print("Unable to update miner address because of the file's permissions".format(error))
+            except declarations.helpers.updateExceptions as error: print("Unable to update miner address. Error {}".format(error))
         # Check if chainPath was passed
         if argsReturns.chainPath:
             # Declare the newDataPath
@@ -83,7 +83,7 @@ class Arguments:
             newDataPath["chain"] = str("{}/{}".format(os.path.dirname(__file__), str(argsReturns.chainPath)[6:])) if str(argsReturns.chainPath)[:6] == "{path}" else str(argsReturns.chainPath) # If {path} was added append the Singular path
             # Save newDataPath
             try: declarations.dynamicConfig.dataPath.set(dict(newDataPath))
-            except declarations.helpers.updateExceptions as error: print("Unable to set chain path because of the file's permissions. Error: {}".format(error))
+            except declarations.helpers.updateExceptions as error: print("Unable to set chain path. Error: {}".format(error))
         # Check if nodesPath was passed
         if argsReturns.nodesPath:
             # Declare the newDataPath

@@ -27,9 +27,9 @@ defaultNetwork = {
     mapping.Network.bootstrapIP: "",
     mapping.Network.magicID: "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib",
     mapping.Network.maxSupply: 10000000000,
+    mapping.Network.maxAmount: 1000,
     mapping.Network.blockMaxReward: 20,
     mapping.Network.rewardName: "bigBang",
-    mapping.Network.maxAmount: 1000,
     mapping.Network.minDiff: 4,
     mapping.Network.maxDiff: 32,
     mapping.Network.testNet: True
