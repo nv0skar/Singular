@@ -23,8 +23,8 @@ class Formulae:
     def calculateReward(transactions=None, forBlock=None):
         """
         Calculate the reward of the miner.
-        To calculate the reward the following algorithm Is used:
-        Reward = (((((BlockMaxSupply*(2*BlockMaxReward)) / BlockMaxReward) - BlocksMined) / ((BlockMaxSupply*(2*BlockMaxReward)) / BlockMaxReward)) * BlockMaxReward) + commissionRewards
+        To calculate the reward the following formula is used:
+        Reward = (((((ChainMaxSupply*(2*ChainMaxReward)) / ChainMaxReward) - BlocksMined) / ((ChainMaxSupply*(2*ChainMaxReward)) / ChainMaxReward)) * ChainMaxReward) + CommissionsReward
         (This assumes that the transaction object itself or prepareTransactions() already subtracted 0.01%)
         """
         # Get the transactions or forBlock if one of those are None
@@ -60,36 +60,17 @@ class Formulae:
         return float(totalReward)
 
     @staticmethod
-    def calculateDifficulty(lastHash, lastBlockAmount, blockReward):
+    def calculateDifficulty(lastBlockTransactions, lastBlockRealAmount):
         """
-        Returns difficulty.
+        Calculate the difficulty of a block
+        To calculate the difficulty of a block the following formula is used:
+        Difficulty = (ChainMaxDifficulty/(ChainMaxAmount/(RealAmountOfLastBlock/TransactionsInLastBlock)))
         """
-        # If there aren't any block return the minDiff
+        # If there aren't any blocks return the minDiff
         if manager.Manager.chainMan.getHeight() == 0: return int(declarations.miningConfig.minDiff)
-        # Get last block hash
-        lastBlockHash = str(lastHash)
-        # Get the brute blocks first two numbers In hash
-        difficultyFoundationNumber = ""
-        # Loop for each character In the hash until we encounter with digit
-        for character in lastBlockHash:
-            if character.isdigit():
-                # Get If the first number that Is going to be added Is not 0
-                if character == "0":
-                    if difficultyFoundationNumber == "": continue
-                # Add the number to the difficultyFoundationNumber
-                difficultyFoundationNumber += character
-                # If they're already 2 numbers in difficultyFoundationNumber break
-                if len(difficultyFoundationNumber) == 2: break
-        # Get the difficulty based on the last block hash
-        if difficultyFoundationNumber != "": hashBasedDiff = int(float(int(declarations.miningConfig.maxDiff) / 100) * int(difficultyFoundationNumber))
-        else: hashBasedDiff = 0
-        # Get the difficulty based on the amount of the transactions In the block
-        amountBasedDiff = int(float(lastBlockAmount / blockReward) + declarations.miningConfig.minDiff)
-        # Set final difficulty
-        difficulty = int(amountBasedDiff if amountBasedDiff < declarations.miningConfig.maxDiff else (declarations.miningConfig.maxDiff - ((hashBasedDiff / 4) if hashBasedDiff != 0 or not hashBasedDiff < declarations.miningConfig.minDiff or not hashBasedDiff > declarations.miningConfig.maxDiff else float(0))))
-        # Checks If the difficulty Is between the minimums and the maximums required
-        if difficulty < declarations.miningConfig.minDiff:
-            difficulty = declarations.miningConfig.minDiff
-        elif difficulty > declarations.miningConfig.maxDiff:
-            difficulty = declarations.miningConfig.maxDiff
+        # Calculate the difficulty
+        difficulty = int(declarations.miningConfig.maxDiff / (float(declarations.chainConfig.maxAmount) / (float(lastBlockRealAmount) / int(lastBlockTransactions))))
+        # Checks If the difficulty is greater than the maximum difficulty established or lower than the minimum difficulty established
+        if difficulty < declarations.miningConfig.minDiff: difficulty = declarations.miningConfig.minDiff
+        elif difficulty > declarations.miningConfig.maxDiff: difficulty = declarations.miningConfig.maxDiff
         return int(difficulty)

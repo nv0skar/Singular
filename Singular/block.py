@@ -92,16 +92,16 @@ class utils:
             # Stage 3 - Get the previous block hash, and set protocol
             reconstructor.protocolVersion = protocolVersion
             reconstructor.lastBlockHash = str("0" * 64)
-            for blockNumberSaved in range(manager.Manager.chainMan.getHeight()):
-                block = manager.Manager.chainMan.getChain(blockNumberSaved)
-                if block.get(mapping.Block.blockNumber) == (blockNumber-1): reconstructor.lastBlockHash = block.get(mapping.Block.hash)
+            reconstructor.lastBlockHash = manager.Manager.chainMan.getChain(blockNumber-1).get(mapping.Block.hash)
             # Stage 4 - Set difficulty
-            lastBlockAmount = 0
-            # Add the amount of the block to lastBlockAmount
-            for trans in reconstructor.transactions:
-                lastBlockAmount += trans.get(mapping.Transactions.realAmount)
+            # Get the real amount and the number of transactions in the last block
+            lastBlockTransactions = 0
+            lastBlockRealAmount = 0
+            for trans in manager.Manager.chainMan.getChain(blockNumber-1).get(mapping.Block.transactions):
+                lastBlockTransactions += 1
+                lastBlockRealAmount += trans.get(mapping.Transactions.realAmount)
             # Calculate difficulty
-            try: reconstructor.difficulty = formulae.Formulae.calculateDifficulty(reconstructor.lastBlockHash, (lastBlockAmount if lastBlockAmount != 0 else declarations.miningConfig.minDiff), formulae.Formulae.calculateReward(reconstructor.transactions, reconstructor.blockNumber))
+            try: reconstructor.difficulty = formulae.Formulae.calculateDifficulty(lastBlockTransactions, lastBlockRealAmount)
             except (AttributeError, ZeroDivisionError, TypeError): reconstructor.difficulty = declarations.miningConfig.minDiff
             # Checks If the blocks difficulty Is None type
             if type(reconstructor.difficulty) is None: reconstructor.difficulty = declarations.miningConfig.minDiff
@@ -132,12 +132,13 @@ class utils:
             blockData.lastBlockHash = manager.Manager.chainMan.getChain().get(mapping.Block.hash)
             blockData.blockNumber = int(manager.Manager.chainMan.getHeight())
             # Stage 4 - Set difficulty
-            lastBlockAmount = 0
-            # Add the amount of the block to lastBlockAmount
-            for trans in blockData.transactions:
-                lastBlockAmount += trans.get(mapping.Transactions.realAmount)
-            # Calculate difficulty
-            try: blockData.difficulty = formulae.Formulae.calculateDifficulty(manager.Manager.chainMan.getChain().get(mapping.Block.hash), (lastBlockAmount if lastBlockAmount != 0 else declarations.miningConfig.minDiff), formulae.Formulae.calculateReward())
+            # Get the real amount and the number of transactions in the last block
+            lastBlockTransactions = 0
+            lastBlockRealAmount = 0
+            for trans in manager.Manager.chainMan.getChain().get(mapping.Block.transactions):
+                lastBlockTransactions += 1
+                lastBlockRealAmount += trans.get(mapping.Transactions.realAmount)# Calculate difficulty
+            try: blockData.difficulty = formulae.Formulae.calculateDifficulty(lastBlockTransactions, lastBlockRealAmount)
             except (AttributeError, ZeroDivisionError, TypeError): blockData.difficulty = declarations.miningConfig.minDiff
             # Checks If the blocks difficulty Is None type
             if type(blockData.difficulty) is None: blockData.difficulty = declarations.miningConfig.minDiff
