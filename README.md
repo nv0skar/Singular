@@ -23,9 +23,12 @@ The Singular protocol documentation **is not written yet**, because the distribu
 
 By the moment only is implemented a part of the API which enables a wallet to communicate with the node.
 
-You can find how the API works by going to [/docs/api.md](https://github.com/ItsTheGuy/Singular/tree/main/docs/api.md)
+You can find...
+- How the API works by going to [/docs/api.md](https://github.com/ItsTheGuy/Singular/tree/main/docs/api.md)
 
-You can also check out how to issue a transaction by going to [/docs/transaction.md](https://github.com/ItsTheGuy/Singular/tree/main/docs/transaction.md)
+- How to issue a transaction by going to [/docs/transaction.md](https://github.com/ItsTheGuy/Singular/tree/main/docs/transaction.md)
+
+- How to calculate rewards and blocks difficulty by going to [/docs/formulae.md](https://github.com/ItsTheGuy/Singular/tree/main/docs/formulae.md)
 
 ## <a name="testnet"></a>Singular's testnet ⭐️
 Singular has a default network which is called **mainSpace**, and it's main purpose is to test the Singular protocol and others implementations of it. As the title says is a testnet, which means that the quantity of coins that are issued are always the maximum amount set.
