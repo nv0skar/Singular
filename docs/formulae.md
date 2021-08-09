@@ -23,11 +23,11 @@ Where:
 To calculate the reward from commissions you have to get the real amount sent by each transaction and substract 0.01% of itself, then you will get the amount that is received by the the receiver.
 
 ```
-(x/100)*(0.01x)
+(x-((x/100)*(0.01)))
 ```
 
 Where:
-- `x` is the number of transactions
+- `x` is the real amount of the transaction
 
 
 ## <a name="formulaeCalculatingBlockDifficulty"></a> Calculating block difficulty

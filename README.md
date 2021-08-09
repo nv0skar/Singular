@@ -17,7 +17,7 @@ The Singular's purpose is to provide a transparent and at the same time a privac
 ## <a name="protocolExplanation"></a>The Singular protocol 🧑‍🚀
 This project is the main implementation of the Singular protocol, however you could make your own implementation of the protocol.
 
-The Singular protocol documentation **is not written yet**, because the distributed network is not yet implemented, however you could suggest how the distributed network should be made in the **Discussions**.
+The Singular protocol documentation **is not completely written yet**, because the distributed network is not yet implemented, however you could suggest how the distributed network should be made in the **Discussions**.
 
 ## <a name="api"></a>API 📡
 
@@ -43,4 +43,3 @@ You can contribute to make this a better project. If you want to purpose somethi
 
 ### <a name="developmentTODO"></a>TODO 🛸
 - [ ] Implement the distributed network
-- [ ] Write documentation for the protocol
