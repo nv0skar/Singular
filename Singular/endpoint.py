@@ -19,11 +19,12 @@ from . import declarations
 from . import manager
 from . import mapping
 from . import block
+from . import helper
 from flask import Flask
 from flask import request
 from flask import jsonify
-from werkzeug.exceptions import HTTPException
 from waitress import serve
+from werkzeug.exceptions import HTTPException
 
 endpoint = Flask(str(declarations.core.agent))
 
@@ -48,7 +49,7 @@ class Endpoint:
         # Disable the reloader
         endpoint.use_reloader = False
         # Start the server
-        declarations.helpers.printer.sprint("main", "Initializing Web API on port {}".format(int(declarations.core.networking.defaultPort)))
+        helper.report("main", "Initializing Web API on port {}".format(int(declarations.core.networking.defaultPort)))
         serve(endpoint, host="0.0.0.0", port=int(declarations.core.networking.defaultPort))
 
     class globals:
@@ -58,8 +59,9 @@ class Endpoint:
             """
             Return info about the node
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
-            return jsonify({"network": str(declarations.chainConfig.name), "networkMagicID": str(declarations.chainConfig.magicID), "protocolVersion": str(declarations.core.protocolVersion), "agent": str(declarations.core.agent)}), 200
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            try: return jsonify({"network": str(declarations.chainConfig.name), "networkMagicID": str(declarations.chainConfig.magicID), "protocolVersion": str(declarations.core.protocolVersion), "agent": str(declarations.core.agent)}), 200
+            except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
 
         @staticmethod
         @endpoint.errorhandler(HTTPException)
@@ -67,8 +69,9 @@ class Endpoint:
             """
             Return JSON instead of HTML for HTTP errors.
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
-            return jsonify({"code": error.code, "name": error.name, "description": error.description})
+            helper.report("networking", "Request on {} from {}; User-Agent: {}; Returning error message".format(request.url, request.remote_addr, request.headers.get("User-Agent")), declarations.helpers.messageLevelTypes.warning)
+            try: return jsonify({"code": error.code, "name": error.name, "description": error.description})
+            except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
 
     class node:
         @staticmethod
@@ -77,7 +80,7 @@ class Endpoint:
             """
             Send the block
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
             try: return jsonify({"blockNumber": str(blockNumber), "block": dict(manager.Manager.chainMan.getChain(blockNumber))}), 200
             except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
 
@@ -87,7 +90,7 @@ class Endpoint:
             """
             Send the memPool
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
             try: return jsonify({"transactions": list(manager.Manager.memPool.getFromPool())}), 200
             except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
 
@@ -97,7 +100,7 @@ class Endpoint:
             """
             Add block to the chain
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
             try:
                 blockToAdd = block.Block(list(request.json(mapping.Block.transactions)))
                 blockToAdd.blockNumber = int(request.json(mapping.Block.blockNumber))
@@ -120,7 +123,7 @@ class Endpoint:
             """
             Add transaction to the memPool
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
             try: transactionManagerResponse = manager.Manager.wallet.transaction(request.json(mapping.Transactions.sender), request.json(mapping.Transactions.receiver), request.json(mapping.Transactions.realAmount), request.json(mapping.Transactions.signature), request.json(mapping.Transactions.time))
             except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
             if transactionManagerResponse: return jsonify({"status": "success", "reason": "Apparently everything went fine ;)"}), 200
@@ -133,8 +136,9 @@ class Endpoint:
             """
             Check the balance for a given wallet
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
-            return jsonify({"address": str(wallet), "balance": float(manager.Manager.wallet.getBalance(str(wallet)))}), 200
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            try: return jsonify({"address": str(wallet), "balance": float(manager.Manager.wallet.getBalance(str(wallet)))}), 200
+            except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
 
         @staticmethod
         @endpoint.route("/wallet/transactions/<wallet>", methods=["GET"])
@@ -142,8 +146,9 @@ class Endpoint:
             """
             Check the transactions of the given wallet
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
-            transactions = manager.Manager.wallet.getTransactions(str(wallet))
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            try: transactions = manager.Manager.wallet.getTransactions(str(wallet))
+            except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "There was some error while trying to process the request"}), 400
             return jsonify({"address": str(wallet), "transactions": list(transactions)}), 200
 
         @staticmethod
@@ -152,7 +157,7 @@ class Endpoint:
             """
             Issue transaction
             """
-            declarations.helpers.printer.sprint("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
+            helper.report("networking", "Request on {} from {}; User-Agent: {}".format(request.url, request.remote_addr, request.headers.get("User-Agent")))
             try: transactionManagerResponse = manager.Manager.wallet.transaction(request.json(mapping.Transactions.sender), request.json(mapping.Transactions.receiver), request.json(mapping.Transactions.realAmount), request.json(mapping.Transactions.signature), request.json(mapping.Transactions.time))
             except (declarations.helpers.baseExceptions): return jsonify({"status": "failed", "reason": "Invalid message format"}), 400
             if transactionManagerResponse: return jsonify({"status": "success", "reason": "Apparently everything went fine ;)"}), 200

@@ -146,7 +146,7 @@ class Manager:
             try:
                 if (int(Manager.chainMan.getHeight()) == 0) and declarations.miningConfig.mining:
                     if not bool(frontend.Frontend.dialogs.startChain()): exit()
-            except (declarations.helpers.baseExceptions): declarations.helpers.printer.sprint("main", "There was an error while checking the the chain height. Chain height check was performed to ask if should start a new chain.")
+            except (declarations.helpers.baseExceptions): helper.report("main", "There was an error while checking the the chain height. Chain height check was performed to ask if should start a new chain.", declarations.helpers.messageLevelTypes.critical); exit()
             # Start the server
             endpoint.Endpoint.init()
             # TODO - Sync the chain, and not continue until there is no error
