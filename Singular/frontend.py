@@ -27,7 +27,7 @@ from rich.console import Console, Style
 
 class Frontend:
     @staticmethod
-    def initial(**kwargs):
+    def initial():
         """
         Shows some info and update the miner address If requested
         """
