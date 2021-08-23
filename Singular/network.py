@@ -60,11 +60,11 @@ class Network:
             return True
 
         @staticmethod
-        def getConf() -> dict:
+        def getConf(bypassIntegrity=False) -> dict:
             """
             Get the network configuration
             """
             # Run integrity check
-            integrity.Integrity.check()
+            if not bypassIntegrity: integrity.Integrity.check()
             # Return data
             return dict(name=declarations.chainConfig.name, bootstrapIP=declarations.chainConfig.bootstrapIP, magicID=declarations.chainConfig.magicID, maxSupply=declarations.chainConfig.maxSupply, maxAmount=declarations.chainConfig.maxAmount, blockMaxReward=declarations.chainConfig.blockMaxReward, rewardName=declarations.chainConfig.rewardName, minDiff=declarations.miningConfig.minDiff, maxDiff=declarations.miningConfig.maxDiff, testNet=declarations.chainConfig.testNet)

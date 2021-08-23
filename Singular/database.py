@@ -34,7 +34,7 @@ class Database:
             try:
                 debugStatus = bool(strtobool(bytes(db.get(str(debugValueKey).encode())).decode()))
                 if debugStatus is not None:
-                    if debugStatus is not bool(declarations.debugConfig.debug): exceptions.Exceptions.Compromised("Global debug status and {} database debug status doesn't match, however, you could try changing the path of the chain and nodes databases or maybe deleting the contents of the databases by passing the --clear argument".format(calledFrom), True)
+                    if debugStatus is not bool(declarations.debugConfig.debug): exceptions.Exceptions.Compromised("Global debug status and {} database debug status doesn't match, however, you could try changing the path of the chain and nodes databases or maybe deleting the contents of the databases by passing the 'data --clear' argument".format(calledFrom), True)
                 else: db.put(str(debugValueKey).encode(), str(bool(declarations.debugConfig.debug)).encode())
             except (AttributeError, TypeError):
                 db.put(str(debugValueKey).encode(), str(bool(declarations.debugConfig.debug)).encode())

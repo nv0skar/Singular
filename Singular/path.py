@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+from . import exceptions
 
 class Path:
     @staticmethod
@@ -22,4 +23,5 @@ class Path:
         """
         Prepare path
         """
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+        try: os.makedirs(os.path.dirname(path), exist_ok=True)
+        except (OSError): exceptions.Exceptions.Compromised("Unable to create database directory ({})".format(path), True)

@@ -27,7 +27,7 @@ from rich.console import Console, Style
 
 class Frontend:
     @staticmethod
-    def initial(passedArguments=None):
+    def initial(**kwargs):
         """
         Shows some info and update the miner address If requested
         """
@@ -37,12 +37,6 @@ class Frontend:
         print(cfonts.render('Singular', colors=["#8b00a6", '#4328a6'], align='center'))
         # Show info
         print("{} - {}\nCtrl-C to exit\n".format(str(declarations.core.version), str(declarations.core.url)))
-        if passedArguments is not None:
-            # Show path If the show argument was passed
-            if passedArguments.show: print("Chain path: {}\nNodes path: {}\nNetwork name: {}\n".format(declarations.staticConfig.dataPath["chain"], declarations.staticConfig.dataPath["nodes"], declarations.chainConfig.name))
-            # Show the network info, If the showNetwork argument was passed
-            if passedArguments.showNetwork: print("Network settings: {}\nEncoded version: {}\n".format(network.Network.config.getConf(),(base64.b64encode(str(network.Network.config.getConf()).encode())).decode()))
-        pass
 
     class setup:
         @staticmethod
