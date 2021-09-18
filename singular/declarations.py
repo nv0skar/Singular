@@ -18,6 +18,7 @@ import os
 import multiprocessing
 from . import globals
 from . import mapping
+from . import helper
 import mars
 import requests
 import superPrinter
@@ -30,15 +31,16 @@ class core:
     url = str(globals.__url__)
     agent = "{}@v{}".format(str(name), str(protocolVersion))
 
+# Files path
+filesPath = dict(config="data/config.json", netConfig="data/network.json", chain="data/database")
 # Config files
-configFiles = dict(config="config.json", networkConfig="network.json", chain="data/chain")
-globalConfigFile = mars.generate(str("{}/{}".format(os.path.dirname(__file__), configFiles["config"])), mars.types.json)
-netConfigFile = mars.generate(str("{}/{}".format(os.path.dirname(__file__), configFiles["networkConfig"])), mars.types.json)
+globalConfigFile = mars.generate(str(helper.path.preparePath(str("{}/{}".format(str(os.path.dirname(__file__)), str(filesPath.get("config")))))), mars.types.json)
+netConfigFile = mars.generate(str(helper.path.preparePath(str("{}/{}".format(str(os.path.dirname(__file__)), str(filesPath.get("netConfig")))))), mars.types.json)
 
 # Configs
 ## Unsafe configs
 class unsafeConfig:
-    dataPath = mars.element(mapping.commons.dataPath, dict(chain=str("{}/{}".format(os.path.dirname(__file__), configFiles["chain"][1:] if configFiles["chain"][0] == "/" else configFiles["chain"]))), globalConfigFile)
+    dbPath = mars.element(mapping.commons.dataPath, str("{}/{}".format(os.path.dirname(__file__), filesPath.get("chain")[1:] if filesPath.get("chain")[0] == "/" else filesPath.get("chain"))), globalConfigFile)
     inform = mars.element(mapping.commons.inform, False, globalConfigFile)
     minerAddress = mars.element(mapping.commons.minerAddress, "", globalConfigFile)
     minerEndpoint = mars.element(mapping.commons.minerEndpoint, "", globalConfigFile)
@@ -62,7 +64,7 @@ class unsafeNetConfig:
 
 ## Safe configs
 class config:
-    dataPath = dict(unsafeConfig.dataPath.get())
+    dbPath = str(unsafeConfig.dbPath.get())
     minerAddress = str(unsafeConfig.minerAddress.get())
     minerEndpoint = str(unsafeConfig.minerEndpoint.get())
 

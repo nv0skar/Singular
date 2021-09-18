@@ -40,7 +40,7 @@ class argParser:
         networkParser.add_argument("-sN", "--showNetwork", help="get network raw info", dest="showNetwork", action="store_true")
         networkParser.add_argument("-nS", "--networkSetup", help="prompt the Network Setup Agent", dest="networkSetup", action="store_true")
         dataParser.add_argument("-s", "--show", help="display the path of the chain's database and the network name before start", dest="show", action="store_true")
-        dataParser.add_argument("--pathChain", help="change the default path to save the chain (Add {path} to get the Singular path)", type=str, dest="chainPath")
+        dataParser.add_argument("-p", "--pathDB", help="change the default path of the database (Add {path} to get the Singular path)", type=str, dest="pathDB")
         dataParser.add_argument("--clear", help="delete the databases contents", dest="clear", action="store_true")
         configParser.add_argument("-mA", "--minerAddress", help="set a miner address", dest="minerAddress", action="store_true")
         configParser.add_argument("-mE", "--minerEndpoint", help="set miner endpoint's address", type=str, dest="minerEndpoint")
@@ -67,7 +67,7 @@ class argParser:
         # Check if the show argument was passed
         try:
             if args.show:
-                print("\nChain path: {}\nNetwork name: {}\n".format(declarations.config.dataPath["chain"], declarations.chainConfig.name))
+                print("\nChain path: {}\nNetwork name: {}\n".format(str(declarations.config.dbPath), str(declarations.chainConfig.name)))
         except (AttributeError): pass
         # Check if the showNetwork argument was passed
         try:
@@ -112,16 +112,14 @@ class argParser:
                     try: declarations.unsafeConfig.minerEndpoint.set(str(args.minerEndpoint))
                     except declarations.helpers.updateExceptions as error: helper.reporter.compromised("Unable to set miner's endpoint address. Error {}".format(error))
         except (AttributeError): pass
-        # Check if chainPath was passed
+        # Check if pathDB was passed
         try:
-            if args.chainPath:
-                # Declare the newDataPath
-                newDataPath = declarations.config.dataPath
-                # Update newDataPath with the new chainPath
-                newDataPath["chain"] = str("{}/{}".format(os.path.dirname(__file__), str(args.chainPath)[6:])) if str(args.chainPath)[:6] == "{path}" else str(args.chainPath) # If {path} was added append the Singular path
-                # Save newDataPath
-                try: declarations.unsafeConfig.dataPath.set(dict(newDataPath))
-                except declarations.helpers.updateExceptions as error: helper.reporter.compromised("Unable to set chain path. Error: {}".format(error))
+            if args.pathDB:
+                # Compose the new database path
+                newDBPath = str("{}/{}".format(os.path.dirname(__file__), str(args.pathDB)[6:])) if str(args.pathDB)[:6] == "{path}" else str(args.pathDB) # If {path} was added append the Singular path
+                # Save the new database path
+                try: declarations.unsafeConfig.dbPath.set(newDBPath)
+                except declarations.helpers.updateExceptions as error: helper.reporter.compromised("Unable to set database path. Error: {}".format(error))
         except (AttributeError): pass
         # Check if toggleMining was passed
         try:
@@ -183,7 +181,7 @@ class argParser:
                 if args.minerEndpoint: return True
             except (AttributeError): pass
             try:
-                if args.chainPath: return True
+                if args.pathDB: return True
             except (AttributeError): pass
             try:
                 if args.toggleMining: return True

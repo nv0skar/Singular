@@ -18,7 +18,6 @@ import ast
 from distutils.util import strtobool
 from . import declarations
 from . import mapping
-from . import path
 from . import helper
 import numpy as np
 import rocksdb
@@ -43,8 +42,7 @@ class database:
         def __init__(self):
             self.__staticKeys = dict(chainLengthValueKey="chainLength", debugValueKey="debug")
             try:
-                path.path.preparePath(str(declarations.config.dataPath["chain"]))
-                self.db = rocksdb.DB(str(declarations.config.dataPath["chain"]), rocksdb.Options(create_if_missing=True))
+                self.db = rocksdb.DB(str(helper.path.preparePath(str(declarations.config.dbPath))), rocksdb.Options(create_if_missing=True))
             except (rocksdb.errors.RocksIOError): helper.reporter.compromised("For some reason the chain's lock file is temporarily unavailable. Maybe another Singular instance is using the same database.", True)
             self.chainLength = self.__lengthManager(init=True); self.__lastBlock = None
 

@@ -23,7 +23,7 @@ from rich.console import Console, Style
 
 class reporter:
     @staticmethod
-    def report(caller, message, level=superPrinter.levels.info, force=False):
+    def report(caller:str, message:str, level=superPrinter.levels.info, force=False):
         """
         Print messages
         """
@@ -57,7 +57,7 @@ class debugging:
 
 class networking:
     @staticmethod
-    def segmentEndpointAddress(endpoint) -> (str, int):
+    def segmentEndpointAddress(endpoint:str) -> (str, int):
         """
         Separate the ip address and port from string
         """
@@ -85,3 +85,13 @@ class conversions:
         """
         try: int(value); return True
         except (ValueError): return False
+
+class path:
+    @staticmethod
+    def preparePath(path:str) -> str:
+        """
+        Prepare path
+        """
+        try: os.makedirs(os.path.dirname(path), exist_ok=True)
+        except (OSError): reporter.compromised("Unable to create directory ({})".format(path), True)
+        return str(path)

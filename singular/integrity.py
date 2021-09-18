@@ -29,7 +29,7 @@ class integrity:
         if declarations.status.extras.bypassIntegrityCheck: return
         # Check that the dynamic data are the same that the ones in memory
         ## Check configs
-        dataPathStatus = declarations.unsafeConfig.dataPath.get() != declarations.config.dataPath
+        dataPathStatus = declarations.unsafeConfig.dbPath.get() != declarations.config.dbPath
         minerAddressStatus = declarations.unsafeConfig.minerAddress.get() != declarations.config.minerAddress
         minerEndpointStatus = declarations.unsafeConfig.minerEndpoint.get() != declarations.config.minerEndpoint
         multiprocessingMiningStatus = declarations.unsafeConfig.multiprocessingMining.get() != declarations.miningConfig.multiprocessingMining

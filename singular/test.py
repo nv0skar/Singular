@@ -58,7 +58,7 @@ class test:
         chainPathTmp = Prompt.ask("Temporal database path", default=str("{}/{}".format(os.path.dirname(__file__), str("tests/"))))
         # Set the temporal database path
         declarations.helpers.printer.sprint("test", "Setting the temporal database path")
-        declarations.config.dataPath["chain"] = str(chainPathTmp)
+        declarations.config.dbPath = str(chainPathTmp)
         # Change the miner's address and endpoint's address
         declarations.config.minerAddress = ""
         declarations.config.minerEndpoint = ""
