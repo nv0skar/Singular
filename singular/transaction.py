@@ -24,7 +24,7 @@ import base64
 import nacl.signing, nacl.exceptions
 import binascii
 
-class Transaction:
+class transaction:
     def __init__(self, sender, receiver, realAmount, signature=None, time=getTime.time()):
         self.sender = sender
         self.receiver = receiver
@@ -47,19 +47,19 @@ class Transaction:
         try:
             # Verify If the a transaction with the same signature Is already In the chain
             try:
-                if manager.Manager.chainMan.getHeight() != 0:
-                    for blockMinedNumber in range(manager.Manager.chainMan.getHeight()):
-                        blockMined = manager.Manager.chainMan.getChain(blockMinedNumber)
-                        for trans in blockMined.get(mapping.Block.transactions):
-                            if trans.get(mapping.Transactions.signature) == self.signature:
-                                helper.report("Transaction verifier", "Repeated signature in the chain")
+                if manager.manager.chainMan.getHeight() != 0:
+                    for blockMinedNumber in range(manager.manager.chainMan.getHeight()):
+                        blockMined = manager.manager.chainMan.getChain(blockMinedNumber)
+                        for trans in blockMined.get(mapping.block.transactions):
+                            if trans.get(mapping.transactions.signature) == self.signature:
+                                helper.reporter.report("transaction verifier", "Repeated signature in the chain")
                                 return False
                 else:
                     # Avoid making a transaction If there aren't any blocks
-                    helper.report("Transaction verifier", "There isn't any block in the chain", level=declarations.helpers.messageLevelTypes.warning)
+                    helper.reporter.report("transaction verifier", "There isn't any block in the chain", level=declarations.helpers.messageLevelTypes.warning)
                     return False
             except AttributeError:
-                helper.report("Transaction verifier", "Failed verification")
+                helper.reporter.report("transaction verifier", "Failed verification")
                 pass
             # Decode the address and the signature from hexadecimal
             address = base64.b16decode(self.sender)
@@ -68,17 +68,17 @@ class Transaction:
             try:
                 verification = nacl.signing.VerifyKey(bytes(address))
             except (ValueError) as e:
-                helper.report("Transaction verifier", str(e))
+                helper.reporter.report("transaction verifier", str(e))
                 return False
             # Checks the message
             try:
                 verification.verify(str(self.compose()).encode(), signature)
                 return True
             except (nacl.exceptions.BadSignatureError):
-                helper.report("Transaction verifier", "Bad signature")
+                helper.reporter.report("transaction verifier", "Bad signature")
                 return False
         except (binascii.Error) as e:
-            helper.report("Transaction verifier", str(e))
+            helper.reporter.report("transaction verifier", str(e))
             return False
 
     def check(self, fetched=False):
@@ -86,43 +86,43 @@ class Transaction:
         Checks If the transaction could be added to the memPool or should be rejected
         """
         # Get memPool
-        memPool = manager.Manager.memPool.getFromPool()
+        memPool = manager.manager.memPool.getFromPool()
         # Check If the sender Is the receiver or the sender or the receiver Is empty
         if str(self.sender) == "" or str(self.receiver) == "" or str(self.sender) == str(self.receiver): return False
         # Check If the sender Is the reward name
         if str(self.sender) == str(declarations.chainConfig.rewardName):
             # Check If there Is already a reward transaction in the memPool
             for trans in memPool:
-                if str(trans.get(mapping.Transactions.sender)) == str(declarations.chainConfig.rewardName) and not fetched:
-                    helper.report("Transaction checker", "There Is already a reward transaction in the memPool")
+                if str(trans.get(mapping.transactions.sender)) == str(declarations.chainConfig.rewardName) and not fetched:
+                    helper.reporter.report("transaction checker", "There Is already a reward transaction in the memPool")
                     return False
             return True
         # Checks the identity
         if not self.verify():
             # The identity Is not valid!
-            helper.report("Transaction checker", "The identity is not valid")
+            helper.reporter.report("transaction checker", "The identity is not valid")
             return False
         # Checks If the realAmount Is more than the maxAmount and If the realAmount or the amount Is 0 or less
         if self.realAmount > declarations.chainConfig.maxAmount or self.realAmount <= 0 or self.amount <= 0:
-            helper.report("Transaction checker", "Size of transaction out of bounds")
+            helper.reporter.report("transaction checker", "Size of transaction out of bounds")
             return False
         # Check If the object Is going to be used to check transactions
         if fetched is False:
             # Get memPool and check If the transaction Is duplicated
             for trans in memPool:
-                if str(trans.get(mapping.Transactions.sender)) == self.sender and str(trans.get(mapping.Transactions.receiver)) == self.receiver:
-                    helper.report("Transaction checker", "The sender and receiver are the same")
+                if str(trans.get(mapping.transactions.sender)) == self.sender and str(trans.get(mapping.transactions.receiver)) == self.receiver:
+                    helper.reporter.report("transaction checker", "The sender and receiver are the same")
                     return False
             # Declare senders balance
-            balance = manager.Manager.wallet.getBalance(self.sender)
+            balance = manager.manager.wallet.getBalance(self.sender)
             # Check if the sender has enough balance and returns It If there Isn't any block mined yet
-            if (manager.Manager.chainMan.getChain()) is not None:
+            if (manager.manager.chainMan.getChain()) is not None:
                 if balance <= 0 or (balance - self.realAmount) < 0:
-                    helper.report("Transaction checker", "The sender has not have enough balance")
+                    helper.reporter.report("transaction checker", "The sender has not have enough balance")
                     return False
             else:
                 # Avoid making a transaction If there Isn't any blocks
-                helper.report("Transaction checker", "There isn't any block in the chain", level=declarations.helpers.messageLevelTypes.warning)
+                helper.reporter.report("transaction checker", "There isn't any block in the chain", level=declarations.helpers.messageLevelTypes.warning)
                 return False
         # Check If the commission Is calculated correctly
         if not self.amount == (self.realAmount - (self.realAmount / 100 * 0.01)): return False
@@ -131,22 +131,22 @@ class Transaction:
 
     def get(self):
         return {
-            mapping.Transactions.sender: self.sender,
-            mapping.Transactions.receiver: self.receiver,
-            mapping.Transactions.amount: self.amount,
-            mapping.Transactions.realAmount: self.realAmount,
-            mapping.Transactions.commission: self.commission,
-            mapping.Transactions.time: self.time,
-            mapping.Transactions.signature: self.signature,
+            mapping.transactions.sender: self.sender,
+            mapping.transactions.receiver: self.receiver,
+            mapping.transactions.amount: self.amount,
+            mapping.transactions.realAmount: self.realAmount,
+            mapping.transactions.commission: self.commission,
+            mapping.transactions.time: self.time,
+            mapping.transactions.signature: self.signature,
         }
 
 class utils:
     @staticmethod
-    def rewardTransactionComposer(miner, reward) -> dict:
+    def rewardTransactionComposer(minerAddress, reward) -> dict:
         """
         Compose reward transaction
         """
-        return Transaction(declarations.chainConfig.rewardName, miner, reward, "Unnecessary!", getTime.time()).get()
+        return transaction(declarations.chainConfig.rewardName, minerAddress, reward, "Unnecessary!", getTime.time()).get()
 
     @staticmethod
     def prepare(transactions, check=True):
@@ -156,18 +156,18 @@ class utils:
         # Get all transactions of the memPool
         transactionsMemPool = list(transactions)
         # Check if the reward transaction of the last block is added if check is true
-        if check and ((manager.Manager.chainMan.getHeight()) != 0):
-            lastBlock = manager.Manager.chainMan.getChain()
-            lastBlockInfo = dict(miner=lastBlock.get(mapping.Block.miner), reward=formulae.Formulae.calculateReward(lastBlock.get(mapping.Block.transactions), lastBlock.get(mapping.Block.blockNumber)))
+        if check and ((manager.manager.chainMan.getHeight()) != 0):
+            lastBlock = manager.manager.chainMan.getChain()
+            lastBlockInfo = dict(minerAddress=lastBlock.get(mapping.block.minerAddress), reward=formulae.formulae.calculateReward(lastBlock.get(mapping.block.transactions), lastBlock.get(mapping.block.blockNumber)))
             rewardTransInMemPool = False
             for trans in transactionsMemPool:
-                if str(trans.get(mapping.Transactions.receiver)) == str(lastBlockInfo.get("miner")): rewardTransInMemPool = True; break
-            if not rewardTransInMemPool: transactionsMemPool.append(utils.rewardTransactionComposer(str(lastBlockInfo.get("miner")), str(lastBlockInfo.get("reward"))))
+                if str(trans.get(mapping.transactions.receiver)) == str(lastBlockInfo.get("minerAddress")): rewardTransInMemPool = True; break
+            if not rewardTransInMemPool: transactionsMemPool.append(utils.rewardTransactionComposer(str(lastBlockInfo.get("minerAddress")), str(lastBlockInfo.get("reward"))))
         # For each transaction make some checks
         for trans in list(transactionsMemPool):
-            sender, receiver, amount, realAmount, commission, signature, time = trans.get(mapping.Transactions.sender), trans.get(mapping.Transactions.receiver), trans.get(mapping.Transactions.amount), trans.get(mapping.Transactions.realAmount), trans.get(mapping.Transactions.commission), trans.get(mapping.Transactions.signature), trans.get(mapping.Transactions.time)
+            sender, receiver, amount, realAmount, commission, signature, time = trans.get(mapping.transactions.sender), trans.get(mapping.transactions.receiver), trans.get(mapping.transactions.amount), trans.get(mapping.transactions.realAmount), trans.get(mapping.transactions.commission), trans.get(mapping.transactions.signature), trans.get(mapping.transactions.time)
             # Make transaction object
-            transToVerify = Transaction(sender, receiver, realAmount, signature, time)
+            transToVerify = transaction(sender, receiver, realAmount, signature, time)
             # Verify transaction
             if not transToVerify.check(True):
                 # Remove transactions from junk

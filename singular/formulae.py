@@ -18,7 +18,7 @@ from . import declarations
 from . import manager
 from . import mapping
 
-class Formulae:
+class formulae:
     @staticmethod
     def calculateReward(transactions=None, forBlock=None):
         """
@@ -28,20 +28,20 @@ class Formulae:
         (This assumes that the transaction object itself or prepareTransactions() already subtracted 0.01%)
         """
         # Get the transactions or forBlock if one of those are None
-        if transactions is None: transactions = manager.Manager.memPool.getFromPool()
-        if forBlock is None: forBlock = manager.Manager.chainMan.getHeight()
+        if transactions is None: transactions = manager.manager.memPool.getFromPool()
+        if forBlock is None: forBlock = manager.manager.chainMan.getHeight()
         # Check if this is the first block
-        if manager.Manager.chainMan.getHeight() == 0: return declarations.chainConfig.blockMaxReward
+        if manager.manager.chainMan.getHeight() == 0: return declarations.chainConfig.maxReward
         # Calculate blocks to mine to achieve the max supply
-        blocksToMineMaxSupply = int((declarations.chainConfig.maxSupply * (2*declarations.chainConfig.blockMaxReward)) / declarations.chainConfig.blockMaxReward)
+        blocksToMineMaxSupply = int((declarations.chainConfig.maxSupply * (2 * declarations.chainConfig.maxReward)) / declarations.chainConfig.maxReward)
         # Calculate the mining reward
         if not int(forBlock) > int(blocksToMineMaxSupply):
-            miningReward = float(((blocksToMineMaxSupply - forBlock) / (blocksToMineMaxSupply)) * declarations.chainConfig.blockMaxReward) if not declarations.chainConfig.testNet else float(blocksToMineMaxSupply * declarations.chainConfig.blockMaxReward)
+            miningReward = float(((blocksToMineMaxSupply - forBlock) / (blocksToMineMaxSupply)) * declarations.chainConfig.maxReward) if not declarations.chainConfig.testNet else float(blocksToMineMaxSupply * declarations.chainConfig.maxReward)
             # Check if the mining reward exceeds the max reward or the reward its equal or less than 0
-            if (miningReward > declarations.chainConfig.blockMaxReward) or (miningReward) <= 0: miningReward = 0
+            if (miningReward > declarations.chainConfig.maxReward) or (miningReward) <= 0: miningReward = 0
         else: miningReward = 0
         # Get the total generated balance
-        generatedBalance = float(float(manager.Manager.wallet.getBalance(declarations.chainConfig.rewardName)) * -1)
+        generatedBalance = float(float(manager.manager.wallet.getBalance(declarations.chainConfig.rewardName)) * -1)
         # Check if the max supply is exceeded or going to be exceeded
         if float(generatedBalance) > float(declarations.chainConfig.maxSupply): miningReward = 0
         if float(((generatedBalance) + miningReward)) > float(declarations.chainConfig.maxSupply):
@@ -50,11 +50,11 @@ class Formulae:
         commissionRewards = 0
         # For unconfirmed transaction was in the memPool get the commission and sum It to commissionRewards
         for trans in transactions:
-            if not trans.get(mapping.Transactions.amount) <= 0:
-                if not trans.get(mapping.Transactions.amount) == (trans.get(mapping.Transactions.realAmount) - (trans.get(mapping.Transactions.realAmount) / 100 * 0.01)):
+            if not trans.get(mapping.transactions.amount) <= 0:
+                if not trans.get(mapping.transactions.amount) == (trans.get(mapping.transactions.realAmount) - (trans.get(mapping.transactions.realAmount) / 100 * 0.01)):
                     # Remove the invalid transaction from the memPool
-                    manager.Manager.memPool.removeFromPool(transactionToRemove=trans)
-                else: commissionRewards += trans[mapping.Transactions.commission]  # Add commission to the commissionRewards
+                    manager.manager.memPool.removeFromPool(transactionToRemove=trans)
+                else: commissionRewards += trans[mapping.transactions.commission]  # Add commission to the commissionRewards
         # Calculate totalReward
         totalReward = float(miningReward + commissionRewards)
         return float(totalReward)
@@ -67,7 +67,7 @@ class Formulae:
         Difficulty = (ChainMaxDifficulty/(ChainMaxAmount/(RealAmountOfLastBlock/TransactionsInLastBlock)))
         """
         # If there aren't any blocks return the minDiff
-        if manager.Manager.chainMan.getHeight() == 0: return int(declarations.miningConfig.minDiff)
+        if manager.manager.chainMan.getHeight() == 0: return int(declarations.miningConfig.minDiff)
         # Calculate the difficulty
         difficulty = int(declarations.miningConfig.maxDiff / (float(declarations.chainConfig.maxAmount) / (float(lastBlockRealAmount) / int(lastBlockTransactions))))
         # Checks If the difficulty is greater than the maximum difficulty established or lower than the minimum difficulty established

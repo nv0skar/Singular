@@ -22,12 +22,11 @@ from . import mapping
 from . import block
 from . import chain
 from . import transaction
-from . import database
+from . import storage
 from . import helper
-import nacl.signing, nacl.exceptions
 from rich.prompt import Prompt
 
-class Test:
+class test:
     @staticmethod
     def blockGenerator(passMemPool):
         """
@@ -35,13 +34,13 @@ class Test:
         """
         # Create a new block
         declarations.helpers.printer.sprint("test", "Creating a new empty block")
-        bruteBlock = block.Block(manager.Manager.memPool.getFromPool() if passMemPool else [])
+        bruteBlock = block.block(manager.manager.memPool.getFromPool() if passMemPool else [])
         # Mine the block
         declarations.helpers.printer.sprint("test", "Mining the block")
-        minedBlock, rewardMiner = chain.Chain.mine(bruteBlock)
+        minedBlock, rewardMiner = chain.chain.mine(bruteBlock)
         # Add block to the temporal chain
         declarations.helpers.printer.sprint("test", "Adding block to the temporal chain")
-        manager.Manager.chainMan.addToChain(minedBlock, addReward=True, reward=rewardMiner, clean=True)
+        manager.manager.chainMan.addToChain(minedBlock, addReward=True, reward=rewardMiner, clean=True)
         return rewardMiner
 
     @staticmethod
@@ -50,59 +49,58 @@ class Test:
         This will perform the tests to check the correct functionality
         """
         # Activate debug mode
-        helper.enableDebug()
-        # Activate test mode
-        declarations.status.testMode = True
+        helper.debugging.enableDebug()
+        # Bypass integrity check
+        declarations.status.extras.bypassIntegrityCheck = True
         # Declarations
         addresses = []
         # Ask for temporal databases path
-        chainPathTmp = Prompt.ask("Temporal database chain path", default=str("{}/{}".format(os.path.dirname(__file__), str("tests/chain/"))))
-        nodesPathTmp = Prompt.ask("Temporal database nodes path", default=str("{}/{}".format(os.path.dirname(__file__), str("tests/nodes/"))))
-        # Set the temporal databases path
-        declarations.helpers.printer.sprint("test", "Setting the chain and node temporal path")
-        declarations.staticConfig.dataPath["chain"] = str(chainPathTmp)
-        declarations.staticConfig.dataPath["nodes"] = str(nodesPathTmp)
-        # Delete the networkMagicID
-        declarations.chainConfig.magicID = "testMode"
+        chainPathTmp = Prompt.ask("Temporal database path", default=str("{}/{}".format(os.path.dirname(__file__), str("tests/"))))
+        # Set the temporal database path
+        declarations.helpers.printer.sprint("test", "Setting the temporal database path")
+        declarations.config.dataPath["chain"] = str(chainPathTmp)
+        # Change the miner's address and endpoint's address
+        declarations.config.minerAddress = ""
+        declarations.config.minerEndpoint = ""
+        # Change the netID
+        declarations.chainConfig.netID = "testMode"
         # Set the rewardName
         declarations.chainConfig.rewardName = "test"
         # Redeclare the databases objects to make the new path take effect
-        declarations.helpers.printer.sprint("test", "Reinitializing databases managers")
-        declarations.databases.chainDB = database.Database.chain()
-        declarations.databases.nodesDB = database.Database.nodes()
+        declarations.helpers.printer.sprint("test", "Reinitializing chain's database manager")
+        declarations.databases.chainDB = storage.storage.chain()
         # Generate 2 addresses
         declarations.helpers.printer.sprint("test", "Generating 2 addresses")
         for _ in range(2):
-            privateKey = nacl.signing.SigningKey.generate()
-            publicKey = privateKey.verify_key
+            publicKey, privateKey = helper.address.generate()
             addresses.append(dict(pubKey=str(publicKey), encodedPubKey=base64.b16encode(eval(str(publicKey))), privKey=str(privateKey), object=privateKey))
         # Set the miner address
         declarations.helpers.printer.sprint("test", "Setting '{}' as the new miner address".format(str(addresses[0].get("encodedPubKey").decode())))
-        declarations.staticConfig.minerAddress = str(addresses[0].get("encodedPubKey").decode())
+        declarations.config.minerAddress = str(addresses[0].get("encodedPubKey").decode())
         # Generate a new block
-        rewardMiner = Test.blockGenerator(False)
+        rewardMiner = test.blockGenerator(False)
         # Generate a new block
-        Test.blockGenerator(True)
+        test.blockGenerator(True)
         # Compose transaction
         declarations.helpers.printer.sprint("test", "Composing new transaction from '{}' to '{}'".format(str(addresses[0].get("encodedPubKey").decode()), str(addresses[1].get("encodedPubKey").decode())))
-        transaction1 = transaction.Transaction(str(addresses[0].get("encodedPubKey").decode()), str(addresses[1].get("encodedPubKey").decode()), float(rewardMiner/2))
+        transaction1 = transaction.transaction(str(addresses[0].get("encodedPubKey").decode()), str(addresses[1].get("encodedPubKey").decode()), float(rewardMiner / 2))
         # Sign transaction
-        declarations.helpers.printer.sprint("test", "Sign transaction")
+        declarations.helpers.printer.sprint("test", "Signing transaction")
         verificationKey = base64.b16encode(bytes(addresses[0].get("object").sign(str(transaction1.compose()).encode()).signature))
         # Issue transaction to the another address
         declarations.helpers.printer.sprint("test", "Issuing transaction")
-        manager.Manager.wallet.transaction(addresses[0].get("encodedPubKey").decode(), addresses[1].get("encodedPubKey").decode(), float(rewardMiner/2), verificationKey, transaction1.time)
+        manager.manager.wallet.transaction(addresses[0].get("encodedPubKey").decode(), addresses[1].get("encodedPubKey").decode(), float(rewardMiner / 2), verificationKey, transaction1.time)
         # Generate a new block
-        Test.blockGenerator(True)
+        test.blockGenerator(True)
         # Check if the transaction was added
         declarations.helpers.printer.sprint("test", "Checking if the transaction was added")
-        lastBlockAdded = manager.Manager.chainMan.getChain()
-        madeTransactionLastBlockAdded = lastBlockAdded.get(mapping.Block.transactions)[1]
-        if madeTransactionLastBlockAdded.get(mapping.Transactions.sender) == str(addresses[0].get("encodedPubKey").decode()) and madeTransactionLastBlockAdded.get(mapping.Transactions.receiver) == str(addresses[1].get("encodedPubKey").decode()):
-                    declarations.helpers.printer.sprint("test", "Transaction in the chain")
-        else: declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Transaction weren't in the chain"); return
+        lastBlockAdded = manager.manager.chainMan.getChain()
+        try: madeTransactionLastBlockAdded = lastBlockAdded.get(mapping.block.transactions)[1]
+        except (IndexError): declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: A block wasn't added to the chain"); return
+        if not (madeTransactionLastBlockAdded.get(mapping.transactions.sender) == str(addresses[0].get("encodedPubKey").decode()) and madeTransactionLastBlockAdded.get(mapping.transactions.receiver) == str(addresses[1].get("encodedPubKey").decode())):
+            declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Transaction weren't in the chain"); return
         # Check if the reward transactions were duplicated
-        if (lastBlockAdded.get(mapping.Block.transactions)[0].get(mapping.Transactions.sender) == str(declarations.chainConfig.rewardName)) and (lastBlockAdded.get(mapping.Block.transactions)[1].get(mapping.Transactions.sender) != str(declarations.chainConfig.rewardName)):
-            declarations.helpers.printer.sprint("test", "Reward transaction not duplicated")
-        else: declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Reward transaction duplicated"); return
+        declarations.helpers.printer.sprint("test", "Checking if the reward transaction is duplicated")
+        if not ((lastBlockAdded.get(mapping.block.transactions)[0].get(mapping.transactions.sender) == str(declarations.chainConfig.rewardName)) and (lastBlockAdded.get(mapping.block.transactions)[1].get(mapping.transactions.sender) != str(declarations.chainConfig.rewardName))):
+            declarations.helpers.printer.sprint("test", "Tests weren't passed! Reason: Reward transaction duplicated"); return
         declarations.helpers.printer.sprint("test", "Tests successfully passed!")

@@ -23,19 +23,15 @@ __url__ = "https://github.com/ItsTheGuy/Singular"
 
 # Default network constants
 defaultNetwork = {
-    mapping.Network.name: "mainSpace",
-    mapping.Network.bootstrapIP: "",
-    mapping.Network.magicID: "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib",
-    mapping.Network.maxSupply: 10000000000,
-    mapping.Network.maxAmount: 1000,
-    mapping.Network.blockMaxReward: 20,
-    mapping.Network.rewardName: "bigBang",
-    mapping.Network.minDiff: 4,
-    mapping.Network.maxDiff: 32,
-    mapping.Network.testNet: True
-}
-
-# Default networking constants
-defaultNetworking = {
-    mapping.Networking.port: 1004
+    mapping.network.name: "mainSpace",
+    mapping.network.initAddress: "",
+    mapping.network.initEndpoint: "",
+    mapping.network.netID: "tLnAENVf5oN59ZcfCCPWShmzhLdgNvHZ1eib",
+    mapping.network.maxSupply: 10000000000,
+    mapping.network.maxAmount: 1000,
+    mapping.network.maxReward: 20,
+    mapping.network.rewardName: "bigBang",
+    mapping.network.minDiff: 4,
+    mapping.network.maxDiff: 32,
+    mapping.network.testNet: True
 }

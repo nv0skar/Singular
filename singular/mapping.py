@@ -14,26 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-class Commons:
+class commons:
     dataPath = "dataPath"
+    inform = "inform"
     minerAddress = "minerAddress"
+    minerEndpoint = "minerEndpoint"
     mining = "mining"
     multiprocessingMining = "multiprocessingMining"
+    timeToCheck = "timeToCheck"
 
-class Block:
+class block:
     blockNumber = "blockNumber"
     lastBlockHash = "lastBlockHash"
     transactions = "transactions"
     difficulty = "difficulty"
     nonce = "nonce"
-    miner = "miner"
+    minerAddress = "minerAddress"
+    minerEndpoint = "minerEndpoint"
     time = "time"
     minerTime = "minerTime"
     hash = "hash"
     protocolVersion = "protocolVersion"
-    networkMagicID = "networkMagicID"
+    netID = "netID"
 
-class Transactions:
+class transactions:
     sender = "sender"
     receiver = "receiver"
     amount = "amount"
@@ -42,18 +46,39 @@ class Transactions:
     time = "time"
     signature = "signature"
 
-class Network:
+class network:
     name = "name"
-    bootstrapIP = "bootstrapIP"
-    magicID = "magicID"
+    initAddress = "initAddress"
+    initEndpoint = "initEndpoint"
+    netID = "id"
     maxSupply = "maxSupply"
     maxAmount = "maxAmount"
-    blockMaxReward = "blockMaxReward"
+    maxReward = "maxReward"
     rewardName = "rewardName"
     minDiff = "minDiff"
     maxDiff = "maxDiff"
     testNet = "testNet"
 
-class Networking:
+class nodes:
+    address = "address"
+    endpoint = "endpoint"
+
+class networking:
     port = "port"
+    class api:
+        protocol = "http://"
+        info = "/"
+        class node:
+            class get:
+                block = "/node/get/block"
+                memPool = "/node/get/memPool"
+            class add:
+                block = "/node/add/block"
+                memPool = "/node/add/memPool"
+        class wallet:
+            class get:
+                balance = "/wallet/balance"
+                transactions = "/wallet/transactions"
+            class add:
+                issueTransaction = "/wallet/issue"
     

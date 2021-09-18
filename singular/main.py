@@ -45,12 +45,12 @@ def main():
         # Set the traceback parser
         rich.traceback.install()
         # Parse arguments
-        args = parser.Arguments.parse()
+        args = parser.argParser.parse()
         # Check integrity
-        integrity.Integrity.check()
+        integrity.integrity.check()
         # Show frontend
-        frontend.Frontend.initial()
+        frontend.frontend.initial()
         # Initialize
-        manager.Manager.protocol.loop(True)
+        manager.manager.main.loop(True)
     except KeyboardInterrupt:
         pass

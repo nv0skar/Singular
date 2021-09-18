@@ -15,17 +15,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import base64
 from . import declarations
 from . import mapping
 from . import network
 from . import helper
 import ast
-import base64
 import cfonts
 from rich.prompt import Prompt, Confirm
 from rich.console import Console, Style
 
-class Frontend:
+class frontend:
     @staticmethod
     def initial():
         """
@@ -40,6 +40,30 @@ class Frontend:
 
     class setup:
         @staticmethod
+        def address():
+            """
+            Setup a new address for the node
+            """
+            # Clear the screen
+            os.system('cls' if os.name == 'nt' else 'clear')
+            # Show title
+            Console().print("Node's address setup agent", style=Style(color="purple", bold=True, underline=True), justify="center")
+            # Ask if want to directly provide a public key or generate a new one
+            if not Confirm.ask("Do you want to enter an existent public key?"):
+                # Generate new address
+                publicKey, privateKey = helper.address.generate()
+                # Print the info
+                print("Public key (base16 Encoded): {}".format(base64.b16encode(eval(str(publicKey))).decode()))
+                print("Private key (base16 Encoded): {}".format(base64.b16encode(eval(str(privateKey))).decode()))
+                # Set the address
+                declarations.unsafeConfig.minerAddress.set(base64.b16encode(eval(str(publicKey))).decode())
+            else:
+                # Ask for public key
+                publicKey = Prompt.ask("Public key", default=str(declarations.config.minerAddress))
+                # Set the address
+                declarations.unsafeConfig.minerAddress.set(publicKey)
+
+        @staticmethod
         def network():
             """
             Setup a new network interface
@@ -52,16 +76,16 @@ class Frontend:
             if not Confirm.ask("Do you want to enter the RAW network configuration?"):
                 # Ask for network name
                 netName = Prompt.ask("Network name", default=str(declarations.chainConfig.name))
-                # Ask for bootstrap IP
-                netBootstrapIP = Prompt.ask("Bootstrap IP", default=str(declarations.chainConfig.bootstrapIP))
-                # Ask for network's magic ID
-                netMagicID = Prompt.ask("Network's magic ID (Leave empty to use the default one, put {generate} to generate a new one)", default=str(declarations.chainConfig.magicID))
+                # Ask for network's init endpoint's address
+                netInitEndpoint = Prompt.ask("Initial endpoint's address", default=str(declarations.chainConfig.initEndpoint))
+                # Ask for network's ID
+                netID = Prompt.ask("Network's ID (Leave empty to use the default one, put {generate} to generate a new one)", default=str(declarations.chainConfig.netID))
                 # Ask for maxSupply
                 netMaxSupply = Prompt.ask("Network's max supply", default=str(declarations.chainConfig.maxSupply))
                  # Ask for maxAmount
                 netMaxAmount = Prompt.ask("Network's max amount (The maximum amount that 1 transaction could send per time)", default=str(declarations.chainConfig.maxAmount))
-                # Ask for blockMaxReward
-                netBlockMaxReward = Prompt.ask("Network's block max reward", default=str(declarations.chainConfig.blockMaxReward))
+                # Ask for maxReward
+                netMaxReward = Prompt.ask("Network's max reward", default=str(declarations.chainConfig.maxReward))
                 # Ask for rewardName
                 netRewardName = Prompt.ask("Network's reward name", default=str(declarations.chainConfig.rewardName))
                 # Ask for minDiff
@@ -79,37 +103,37 @@ class Frontend:
                     try: rawNetConf = dict(ast.literal_eval(str(base64.b64decode(rawNetConfInput.encode()).decode())))
                     except (ValueError, SyntaxError): Console().print("Network setup agent failed: {}".format("The entered configuration was invalid"), style=Style(color="red", bold=True)); return
                 # Get the network name
-                if bool(rawNetConf.get(mapping.Network.name)): netName = str(rawNetConf.get(mapping.Network.name))
+                if bool(rawNetConf.get(mapping.network.name)): netName = str(rawNetConf.get(mapping.network.name))
                 else: netName = declarations.chainConfig.name
-                # Get the bootstrap IP
-                if bool(rawNetConf.get(mapping.Network.bootstrapIP)): netBootstrapIP = str(rawNetConf.get(mapping.Network.bootstrapIP))
-                else: netBootstrapIP = declarations.chainConfig.bootstrapIP
+                # Get the network's init endpoint's address
+                if bool(rawNetConf.get(mapping.network.initEndpoint)): netInitEndpoint = str(rawNetConf.get(mapping.network.initEndpoint))
+                else: netInitEndpoint = declarations.chainConfig.initEndpoint
                 # Get the network's magic number
-                if bool(rawNetConf.get(mapping.Network.magicID)): netMagicID = str(rawNetConf.get(mapping.Network.magicID))
-                else: netMagicID = declarations.chainConfig.magicID
+                if bool(rawNetConf.get(mapping.network.netID)): netID = str(rawNetConf.get(mapping.network.netID))
+                else: netID = declarations.chainConfig.netID
                 # Get the maxSupply
-                if bool(rawNetConf.get(mapping.Network.maxSupply)): netMaxSupply = float(rawNetConf.get(mapping.Network.maxSupply))
+                if bool(rawNetConf.get(mapping.network.maxSupply)): netMaxSupply = float(rawNetConf.get(mapping.network.maxSupply))
                 else: netMaxSupply = declarations.chainConfig.maxSupply
                 # Get the maxAmount
-                if bool(rawNetConf.get(mapping.Network.maxAmount)): netMaxAmount = float(rawNetConf.get(mapping.Network.maxAmount))
+                if bool(rawNetConf.get(mapping.network.maxAmount)): netMaxAmount = float(rawNetConf.get(mapping.network.maxAmount))
                 else: netMaxAmount = declarations.chainConfig.maxAmount
-                # Get the blockMaxReward
-                if bool(rawNetConf.get(mapping.Network.blockMaxReward)): netBlockMaxReward = float(rawNetConf.get(mapping.Network.blockMaxReward))
-                else: netBlockMaxReward = declarations.chainConfig.blockMaxReward
+                # Get the maxReward
+                if bool(rawNetConf.get(mapping.network.maxReward)): netMaxReward = float(rawNetConf.get(mapping.network.maxReward))
+                else: netMaxReward = declarations.chainConfig.maxReward
                 # Get the rewardName
-                if bool(rawNetConf.get(mapping.Network.rewardName)): netRewardName = str(rawNetConf.get(mapping.Network.rewardName))
+                if bool(rawNetConf.get(mapping.network.rewardName)): netRewardName = str(rawNetConf.get(mapping.network.rewardName))
                 else: netRewardName = declarations.chainConfig.rewardName
                 # Get the minDiff
-                if bool(rawNetConf.get(mapping.Network.minDiff)): netMinDiff = str(rawNetConf.get(mapping.Network.minDiff))
+                if bool(rawNetConf.get(mapping.network.minDiff)): netMinDiff = str(rawNetConf.get(mapping.network.minDiff))
                 else: netMinDiff = declarations.miningConfig.minDiff
                 # Get the maxDiff
-                if bool(rawNetConf.get(mapping.Network.maxDiff)): netMaxDiff = str(rawNetConf.get(mapping.Network.maxDiff))
+                if bool(rawNetConf.get(mapping.network.maxDiff)): netMaxDiff = str(rawNetConf.get(mapping.network.maxDiff))
                 else: netMaxDiff = declarations.miningConfig.maxDiff
                 # Get if network is testnet
-                if bool(rawNetConf.get(mapping.Network.minDiff)): netTestNet = bool(rawNetConf.get(mapping.Network.testNet))
+                if bool(rawNetConf.get(mapping.network.minDiff)): netTestNet = bool(rawNetConf.get(mapping.network.testNet))
                 else: netTestNet = declarations.chainConfig.testNet
             # Execute setup
-            setupSuccess = network.Network.config.setup(netName, netBootstrapIP, netMagicID, netMaxSupply, netMaxAmount, netBlockMaxReward, netRewardName, netMinDiff, netMaxDiff, netTestNet)
+            setupSuccess = network.network.config.setup(netName, netInitEndpoint, netID, netMaxSupply, netMaxAmount, netMaxReward, netRewardName, netMinDiff, netMaxDiff, netTestNet)
             if not type(setupSuccess) is str: Console().print("Network setup agent completed successfully", style=Style(color="green"))
             else: Console().print("Network setup agent failed: {}".format(setupSuccess), style=Style(color="red", bold=True))
 
@@ -119,11 +143,11 @@ class Frontend:
             """
             Ask if a new chain should start
             """
-            return bool(Confirm.ask("There isn't a chain started. Do you want to start a new one?"))
+            return bool(Confirm.ask("There isn't a chain started. Do you want to start a new one? (Syncing with other nodes will occur after starting the local chain)"))
 
         @staticmethod
         def blockMined(block):
             """
             Print that the block Is mined
             """
-            helper.report("main", "Block mined! Block number: {}; Mining time: {}".format(block.get(mapping.Block.blockNumber), block.get(mapping.Block.minerTime)))
+            helper.reporter.report("main", "Block mined! Block number: {}; Mining time: {}".format(block.get(mapping.block.blockNumber), block.get(mapping.block.minerTime)), force=True)

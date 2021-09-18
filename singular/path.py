@@ -14,10 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-class p2p:
+import os
+from . import helper
+
+class path:
     @staticmethod
-    def start():
+    def preparePath(path):
         """
-        Start p2p process
+        Prepare path
         """
-        pass
+        try: os.makedirs(os.path.dirname(path), exist_ok=True)
+        except (OSError): helper.reporter.compromised("Unable to create database directory ({})".format(path), True)

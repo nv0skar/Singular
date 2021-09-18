@@ -21,7 +21,7 @@ from . import miner
 from . import block as bl
 from . import formulae
 
-class Chain:
+class chain:
     @staticmethod
     def mine(bruteBlock, autoCleanMemPool=True):
         """
@@ -36,18 +36,18 @@ class Chain:
         # Counts how much time takes to calculate the nonce
         initializingTime = float(time.time())
         # Initialize miner
-        blockMined = miner.Miner.start(blockToMine, difficulty, prefix, initializingTime)
+        blockMined = miner.miner.start(blockToMine, difficulty, prefix, initializingTime)
         # Check If the block was mined
         if blockMined is not None:
             # The nonce was found
             # Check If the block Is already In the chain
             try:
-                if blockMined.get(mapping.Block.blockNumber) == int(manager.Manager.chainMan.getChain().get(mapping.Block.blockNumber)): return False, 0 # The block Is already In the chain!
+                if blockMined.get(mapping.block.blockNumber) == int(manager.manager.chainMan.getChain().get(mapping.block.blockNumber)): return False, 0 # The block Is already In the chain!
             except (AttributeError, TypeError): pass
             # Now reward the miner!
-            reward = formulae.Formulae.calculateReward()
+            reward = formulae.formulae.calculateReward()
             # Clean memPool If requested
             if autoCleanMemPool:
-                manager.Manager.memPool.removeFromPool(clean=True)
+                manager.manager.memPool.removeFromPool(clean=True)
             return blockMined, reward
         else: return False, 0

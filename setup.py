@@ -15,16 +15,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from setuptools import find_packages, setup
-import Singular
+import singular
 
 setup(
     name="Singular",
-    version=Singular.globals.__version__,
+    version=singular.globals.__version__,
     description="A unique blockchain made by humanity for humanity",
     python_requires=">=3.7.9",
-    url=Singular.globals.__url__,
-    packages=find_packages(include=["Singular"]),
+    url=singular.globals.__url__,
+    packages=find_packages(include=["singular"]),
     entry_points={
-        'console_scripts': ['singular=Singular:main.main'],
+        'console_scripts': ['singular=singular:main.main'],
     },
 )
