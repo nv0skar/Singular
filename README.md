@@ -10,8 +10,8 @@ I didn't have to do anything at the afternoons in one of my holidays, so I start
 
 ## <a name="purpose"></a>The Singular's purpose 🛰
 The Singular's purpose is to provide a transparent and at the same time a privacy fully form of money. The Singular's targets are:
-- Security
-- Privacy
+- Security: Uses the `Ed25519` algorithm for the keys generation and `Sha256` for the block hashing
+- Privacy (However, the IP and other info about the device from where the transaction was sent is displayed at the node, and could be saved)
 - Ease
 
 ## <a name="protocolExplanation"></a>The Singular protocol 🧑‍🚀
